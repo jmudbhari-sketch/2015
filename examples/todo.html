@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>To-do</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: rgba(220, 235, 210, 0.96);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    /* ── Card ── */
+    .container {
+      margin-top: 20vh;
+      margin-bottom: 40px;
+      width: 300px;
+      background-color: rgb(76, 153, 0);
+      border-radius: 2%;
+      padding: 16px;
+      box-shadow: 3px 6px 8px -1px rgba(60, 120, 10, 0.92);
+    }
+
+    /* ── Title ── */
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.96);
+      text-align: center;
+      margin-bottom: 2px;
+      letter-spacing: 0.02em;
+    }
+    .title-art {
+      color: rgba(30, 70, 0, 0.75);
+    }
+
+    /* ── Counter ── */
+    .counter {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(30, 70, 0, 0.65);
+      margin-bottom: 12px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* ── Input row ── */
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .task-input {
+      flex: 1;
+      height: 38px;
+      background-color: #7ed957;
+      border: none;
+      border-radius: 3%;
+      padding: 0 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      box-shadow: inset 2px 3px 9px 1px rgba(0,0,0,0.2);
+      outline: none;
+      font-family: Arial, sans-serif;
+    }
+
+    .task-input::placeholder {
+      color: rgba(255,255,255,0.55);
+      font-weight: 400;
+    }
+
+    .task-input:focus {
+      box-shadow: inset 2px 3px 9px 1px rgba(0,0,0,0.28), 0 0 0 2px rgba(180,255,100,0.5);
+    }
+
+    /* ── Buttons (shared shape from design system) ── */
+    .btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 15%;
+      border: none;
+      color: white;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 3px 3px 19px 0px rgba(0,0,0,0.27);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: box-shadow 0.08s;
+      font-family: Arial, sans-serif;
+    }
+
+    .btn:hover  { box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.27); }
+    .btn:active { box-shadow: inset 0px 0px 33px 16px rgba(0,0,0,0.27); }
+
+    .btn-add   { background-color: rgba(120, 200, 20, 0.9); }
+    .btn-clear { background-color: rgba(160, 60, 60, 0.87); width: 38px; height: 38px; font-size: 13px; font-weight: 600; }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: rgba(30, 70, 0, 0.2);
+      margin: 4px 0 10px;
+    }
+
+    /* ── Task list ── */
+    .task-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 320px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .task-list::-webkit-scrollbar { width: 4px; }
+    .task-list::-webkit-scrollbar-track { background: transparent; }
+    .task-list::-webkit-scrollbar-thumb { background: rgba(30,70,0,0.3); border-radius: 4px; }
+
+    /* ── Task item ── */
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #7ed957;
+      border-radius: 3%;
+      padding: 9px 10px;
+      box-shadow: 3px 3px 19px 0px rgba(0,0,0,0.18);
+      animation: slideIn 0.18s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .task-item.done {
+      background-color: rgba(100, 180, 40, 0.6);
+    }
+
+    /* Checkbox — styled as a mini soft-square button */
+    .task-check {
+      width: 26px;
+      height: 26px;
+      border-radius: 30%;
+      border: none;
+      background-color: rgba(60, 130, 0, 0.5);
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.22);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background-color 0.15s, box-shadow 0.08s;
+      color: white;
+      font-size: 14px;
+    }
+
+    .task-check:hover  { box-shadow: 1px 1px 4px rgba(0,0,0,0.22); }
+    .task-check:active { box-shadow: inset 0 0 14px 6px rgba(0,0,0,0.27); }
+
+    .task-item.done .task-check {
+      background-color: rgba(20, 180, 100, 0.85);
+    }
+
+    .task-text {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      word-break: break-word;
+      transition: opacity 0.2s;
+    }
+
+    .task-item.done .task-text {
+      text-decoration: line-through;
+      opacity: 0.55;
+    }
+
+    /* Delete button per item */
+    .task-del {
+      width: 26px;
+      height: 26px;
+      border-radius: 30%;
+      border: none;
+      background-color: rgba(160, 50, 50, 0.75);
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.22);
+      transition: box-shadow 0.08s;
+    }
+    .task-del:hover  { box-shadow: 1px 1px 4px rgba(0,0,0,0.22); }
+    .task-del:active { box-shadow: inset 0 0 14px 6px rgba(0,0,0,0.27); }
+
+    /* ── Empty state ── */
+    .empty {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(30, 70, 0, 0.5);
+      padding: 18px 0 10px;
+    }
+
+    /* ── Bottom row ── */
+    .bottom-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="title"><span class="title-art">to-do</span></div>
+  <div class="counter" id="counter">0 tasks</div>
+
+  <div class="input-row">
+    <input
+      class="task-input"
+      id="taskInput"
+      type="text"
+      placeholder="add a task…"
+      maxlength="80"
+      autocomplete="off"
+    />
+    <button class="btn btn-add" id="addBtn" title="Add task">+</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <ul class="task-list" id="taskList">
+    <li class="empty" id="emptyMsg">nothing here yet</li>
+  </ul>
+
+  <div class="bottom-row">
+    <button class="btn btn-clear" id="clearBtn" title="Clear completed">✓ clear</button>
+  </div>
+</div>
+
+<script>
+  const input    = document.getElementById('taskInput');
+  const addBtn   = document.getElementById('addBtn');
+  const list     = document.getElementById('taskList');
+  const emptyMsg = document.getElementById('emptyMsg');
+  const counter  = document.getElementById('counter');
+  const clearBtn = document.getElementById('clearBtn');
+
+  let tasks = []; // { id, text, done }
+
+  function uid() {
+    return Math.random().toString(36).slice(2);
+  }
+
+  function updateCounter() {
+    const total = tasks.length;
+    const done  = tasks.filter(t => t.done).length;
+    if (total === 0) {
+      counter.textContent = '0 tasks';
+    } else {
+      counter.textContent = `${done} / ${total} done`;
+    }
+  }
+
+  function render() {
+    // Remove all task items (keep emptyMsg)
+    [...list.querySelectorAll('.task-item')].forEach(el => el.remove());
+
+    if (tasks.length === 0) {
+      emptyMsg.style.display = '';
+    } else {
+      emptyMsg.style.display = 'none';
+      tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.className = 'task-item' + (task.done ? ' done' : '');
+        li.dataset.id = task.id;
+
+        // Check button
+        const check = document.createElement('button');
+        check.className = 'task-check';
+        check.title = task.done ? 'Mark undone' : 'Mark done';
+        check.innerHTML = task.done
+          ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+          : '';
+        check.addEventListener('click', () => toggleTask(task.id));
+
+        // Text
+        const span = document.createElement('span');
+        span.className = 'task-text';
+        span.textContent = task.text;
+
+        // Delete
+        const del = document.createElement('button');
+        del.className = 'task-del';
+        del.title = 'Delete';
+        del.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+        del.addEventListener('click', () => deleteTask(task.id));
+
+        li.append(check, span, del);
+        list.appendChild(li);
+      });
+    }
+
+    updateCounter();
+  }
+
+  function addTask() {
+    const text = input.value.trim();
+    if (!text) return;
+    tasks.push({ id: uid(), text, done: false });
+    input.value = '';
+    render();
+    // Scroll list to bottom
+    list.scrollTop = list.scrollHeight;
+  }
+
+  function toggleTask(id) {
+    const t = tasks.find(t => t.id === id);
+    if (t) t.done = !t.done;
+    render();
+  }
+
+  function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    render();
+  }
+
+  addBtn.addEventListener('click', addTask);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') addTask();
+  });
+
+  clearBtn.addEventListener('click', () => {
+    tasks = tasks.filter(t => !t.done);
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>

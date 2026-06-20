@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pomodoro</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      color: rgba(245, 236, 236, 0.96);
+      text-align: center;
+      background-color: rgba(230, 230, 230, 0.96);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .container {
+      margin-top: 20vh;
+      padding: 15px;
+      background-color: rgb(196, 40, 62);
+      width: 275px;
+      border-radius: 2%;
+      box-shadow: 3px 6px 8px -1px rgba(185, 63, 80, 0.92);
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .title-art {
+      color: rgba(105, 38, 38, 0.81);
+    }
+
+    .timer-display {
+      font-size: 36px;
+      font-weight: 600;
+      margin: 10px 0;
+      letter-spacing: 2px;
+    }
+
+    .buttons-change {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .btn-circle {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background-color: rgba(201, 54, 76, 0.87);
+      border: none;
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 3px 3px 19px 0px rgba(0,0,0,0.27);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: box-shadow 0.1s;
+      line-height: 1;
+    }
+
+    .btn-circle:hover {
+      box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.27);
+    }
+
+    .btn-circle:active {
+      box-shadow: inset 0px 0px 33px 16px rgba(0,0,0,0.27);
+    }
+
+    .buttons-timer {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn-action {
+      width: 45px;
+      height: 45px;
+      border-radius: 15%;
+      border: none;
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 3px 3px 19px 0px rgba(0,0,0,0.27);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: box-shadow 0.1s, background-color 0.15s;
+    }
+
+    .btn-action:hover {
+      box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.27);
+    }
+
+    .btn-action:active {
+      box-shadow: inset 0px 0px 33px 16px rgba(0,0,0,0.27);
+    }
+
+    #playBtn {
+      background-color: rgba(203, 35, 59, 0.87);
+    }
+
+    #resetBtn {
+      background-color: rgba(203, 35, 59, 0.87);
+    }
+
+    /* SVG icons inline */
+    .icon {
+      width: 16px;
+      height: 16px;
+      fill: white;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="title"><span class="title-art">pomodoro</span></div>
+
+  <div class="timer-display" id="timerDisplay">00:25:00</div>
+
+  <div class="buttons-change">
+    <button class="btn-circle" id="subBtn" title="Remove 5 minutes">−</button>
+    <button class="btn-circle" id="addBtn" title="Add 5 minutes">+</button>
+  </div>
+
+  <div class="buttons-timer">
+    <button class="btn-action" id="playBtn" title="Play / Pause">
+      <!-- Play icon -->
+      <svg class="icon" id="playIcon" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+      <!-- Pause icon (hidden) -->
+      <svg class="icon" id="pauseIcon" viewBox="0 0 24 24" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+    </button>
+    <button class="btn-action" id="resetBtn" title="Reset">
+      <!-- Undo/reset icon -->
+      <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-6.3 2.55L3 3v6h6l-2.1-2.1A7 7 0 1 1 5 12z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  const DEFAULT_MINUTES = 25;
+  let totalSeconds = DEFAULT_MINUTES * 60;
+  let interval = null;
+  let isRunning = false;
+
+  const display = document.getElementById('timerDisplay');
+  const playBtn = document.getElementById('playBtn');
+  const playIcon = document.getElementById('playIcon');
+  const pauseIcon = document.getElementById('pauseIcon');
+
+  function formatTime(s) {
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    const hh = h > 0 ? String(h).padStart(2, '0') + ':' : '00:';
+    return hh + String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+  }
+
+  function updateDisplay() {
+    display.textContent = formatTime(totalSeconds);
+  }
+
+  function tick() {
+    if (totalSeconds > 0) {
+      totalSeconds--;
+      updateDisplay();
+    } else {
+      clearInterval(interval);
+      isRunning = false;
+      setPlayState(false);
+    }
+  }
+
+  function setPlayState(playing) {
+    isRunning = playing;
+    if (playing) {
+      playIcon.style.display = 'none';
+      pauseIcon.style.display = '';
+    } else {
+      playIcon.style.display = '';
+      pauseIcon.style.display = 'none';
+    }
+  }
+
+  playBtn.addEventListener('click', () => {
+    if (!isRunning) {
+      setPlayState(true);
+      tick(); // immediate first tick
+      interval = setInterval(tick, 1000);
+    } else {
+      clearInterval(interval);
+      setPlayState(false);
+    }
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    clearInterval(interval);
+    setPlayState(false);
+    totalSeconds = DEFAULT_MINUTES * 60;
+    updateDisplay();
+  });
+
+  document.getElementById('addBtn').addEventListener('click', () => {
+    totalSeconds += 5 * 60;
+    updateDisplay();
+  });
+
+  document.getElementById('subBtn').addEventListener('click', () => {
+    if (totalSeconds >= 5 * 60) {
+      totalSeconds -= 5 * 60;
+    } else {
+      totalSeconds = 0;
+    }
+    updateDisplay();
+  });
+
+  updateDisplay();
+</script>
+</body>
+</html>
