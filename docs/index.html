@@ -1,0 +1,2832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Widget — Component Library Docs</title>
+  <style>:root { --wg-hero-hue: 240; }</style>
+  <style>
+/*
+ * widget.css — Component Library v1.0
+ * Design language: saturated monochromatic theming, tactile shadows,
+ * soft-square radii, bold white-on-color.
+ *
+ * Usage:
+ *   <link rel="stylesheet" href="widget.css">
+ *   <script src="widget-theme.js"></script>
+ *   <script src="widget-interact.js"></script>
+ *
+ * Set hero color via CSS var before the scripts load:
+ *   <style>:root { --wg-hero-hex: #1093af; }<\/style>
+ *   or call WidgetTheme.set(200) in JS.
+ *
+ * All tokens are CSS custom properties prefixed --wg-
+ * Override any token after theme is applied.
+ */
+
+/* ════════════════════════════════════════════════════════════
+   0. RESET & BASE
+════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 15px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: Arial, 'Helvetica Neue', sans-serif;
+  font-size: var(--wg-text-base, 15px);
+  background-color: var(--wg-page-bg, #e8e8f0);
+  color: var(--wg-text-primary, rgba(255,255,255,0.96));
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+img, svg { display: block; max-width: 100%; }
+button, input, select, textarea { font-family: inherit; }
+a { color: inherit; }
+
+/* ════════════════════════════════════════════════════════════
+   1. TOKENS — fallback values (overridden by widget-theme.js)
+════════════════════════════════════════════════════════════ */
+
+:root {
+  --wg-page-bg:      #d7d7f0;
+  --wg-card:         hsl(240,55%,42%);
+  --wg-btn:          hsla(240,59%,48%,0.90);
+  --wg-surface:      hsl(240,57%,56%);
+  --wg-surface2:     hsl(240,52%,64%);
+  --wg-inset:        hsl(240,61%,52%);
+  --wg-art:          hsla(240,40%,14%,0.72);
+  --wg-text-primary: hsla(0,0%,100%,0.96);
+  --wg-text-secondary:hsla(0,0%,100%,0.60);
+  --wg-text-muted:   hsla(0,0%,100%,0.38);
+  --wg-card-shadow:  3px 6px 8px -1px hsla(240,40%,26%,0.88);
+  --wg-btn-shadow:   3px 3px 19px 0px rgba(0,0,0,0.27);
+  --wg-btn-hover:    1px 1px 5px 0px rgba(0,0,0,0.27);
+  --wg-btn-active:   inset 0px 0px 33px 16px rgba(0,0,0,0.27);
+  --wg-inset-shadow: inset 2px 3px 9px 1px rgba(0,0,0,0.22);
+  --wg-danger:       hsl(355,65%,50%);
+  --wg-success:      hsl(158,58%,40%);
+  --wg-warning:      hsl(38,90%,48%);
+  --wg-info:         hsl(205,60%,45%);
+  --wg-danger-bg:    hsla(355,65%,50%,0.15);
+  --wg-success-bg:   hsla(158,58%,40%,0.15);
+  --wg-warning-bg:   hsla(38,90%,48%,0.15);
+  --wg-info-bg:      hsla(205,60%,45%,0.15);
+  --wg-radius-card:  2%;
+  --wg-radius-btn:   15%;
+  --wg-radius-wide:  3%;
+  --wg-radius-circle:50%;
+  --wg-radius-chip:  15%;
+  --wg-space-1: 4px;  --wg-space-2: 8px;   --wg-space-3: 12px;
+  --wg-space-4: 16px; --wg-space-5: 24px;  --wg-space-6: 32px;
+  --wg-space-7: 48px; --wg-space-8: 64px;
+  --wg-text-xs:  11px; --wg-text-sm:  13px; --wg-text-base:15px;
+  --wg-text-lg:  18px; --wg-text-xl:  22px; --wg-text-2xl: 28px;
+  --wg-text-3xl: 36px;
+  --wg-transition: 0.08s ease;
+}
+
+/* ════════════════════════════════════════════════════════════
+   2. LAYOUT — Container & 12-col Flexbox Grid
+════════════════════════════════════════════════════════════ */
+
+.wg-container {
+  width: 100%;
+  max-width: 1080px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--wg-space-5);
+  padding-right: var(--wg-space-5);
+}
+
+.wg-container-sm  { max-width: 640px; }
+.wg-container-md  { max-width: 800px; }
+.wg-container-fluid { max-width: none; }
+
+/* Row */
+.wg-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: calc(var(--wg-space-4) * -0.5);
+  margin-right: calc(var(--wg-space-4) * -0.5);
+}
+
+/* Columns */
+[class*="wg-col-"] {
+  padding-left: calc(var(--wg-space-4) * 0.5);
+  padding-right: calc(var(--wg-space-4) * 0.5);
+  width: 100%;
+}
+
+.wg-col-1  { width: 8.333%; }
+.wg-col-2  { width: 16.666%; }
+.wg-col-3  { width: 25%; }
+.wg-col-4  { width: 33.333%; }
+.wg-col-5  { width: 41.666%; }
+.wg-col-6  { width: 50%; }
+.wg-col-7  { width: 58.333%; }
+.wg-col-8  { width: 66.666%; }
+.wg-col-9  { width: 75%; }
+.wg-col-10 { width: 83.333%; }
+.wg-col-11 { width: 91.666%; }
+.wg-col-12 { width: 100%; }
+.wg-col    { flex: 1; }
+
+/* Responsive breakpoints: sm ≥ 576, md ≥ 768, lg ≥ 1024 */
+@media (min-width: 576px) {
+  .wg-col-sm-1  { width: 8.333%; }  .wg-col-sm-2  { width: 16.666%; }
+  .wg-col-sm-3  { width: 25%; }     .wg-col-sm-4  { width: 33.333%; }
+  .wg-col-sm-5  { width: 41.666%; } .wg-col-sm-6  { width: 50%; }
+  .wg-col-sm-7  { width: 58.333%; } .wg-col-sm-8  { width: 66.666%; }
+  .wg-col-sm-9  { width: 75%; }     .wg-col-sm-10 { width: 83.333%; }
+  .wg-col-sm-11 { width: 91.666%; } .wg-col-sm-12 { width: 100%; }
+}
+@media (min-width: 768px) {
+  .wg-col-md-1  { width: 8.333%; }  .wg-col-md-2  { width: 16.666%; }
+  .wg-col-md-3  { width: 25%; }     .wg-col-md-4  { width: 33.333%; }
+  .wg-col-md-5  { width: 41.666%; } .wg-col-md-6  { width: 50%; }
+  .wg-col-md-7  { width: 58.333%; } .wg-col-md-8  { width: 66.666%; }
+  .wg-col-md-9  { width: 75%; }     .wg-col-md-10 { width: 83.333%; }
+  .wg-col-md-11 { width: 91.666%; } .wg-col-md-12 { width: 100%; }
+}
+@media (min-width: 1024px) {
+  .wg-col-lg-1  { width: 8.333%; }  .wg-col-lg-2  { width: 16.666%; }
+  .wg-col-lg-3  { width: 25%; }     .wg-col-lg-4  { width: 33.333%; }
+  .wg-col-lg-5  { width: 41.666%; } .wg-col-lg-6  { width: 50%; }
+  .wg-col-lg-7  { width: 58.333%; } .wg-col-lg-8  { width: 66.666%; }
+  .wg-col-lg-9  { width: 75%; }     .wg-col-lg-10 { width: 83.333%; }
+  .wg-col-lg-11 { width: 91.666%; } .wg-col-lg-12 { width: 100%; }
+}
+
+/* ════════════════════════════════════════════════════════════
+   3. TYPOGRAPHY
+════════════════════════════════════════════════════════════ */
+
+.wg-h1, .wg-h2, .wg-h3, .wg-h4, .wg-h5, .wg-h6 {
+  font-weight: 700; line-height: 1.15; color: var(--wg-text-primary);
+}
+.wg-h1 { font-size: var(--wg-text-3xl); }
+.wg-h2 { font-size: var(--wg-text-2xl); }
+.wg-h3 { font-size: var(--wg-text-xl); }
+.wg-h4 { font-size: var(--wg-text-lg); }
+.wg-h5 { font-size: var(--wg-text-base); }
+.wg-h6 { font-size: var(--wg-text-sm); }
+
+.wg-lead    { font-size: var(--wg-text-lg); font-weight: 400; color: var(--wg-text-secondary); }
+.wg-small   { font-size: var(--wg-text-sm); }
+.wg-eyebrow {
+  font-size: var(--wg-text-xs); font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--wg-art);
+}
+.wg-art {
+  /* The "watermark" title treatment from Pomodoro */
+  color: var(--wg-art);
+  font-weight: 700;
+}
+
+/* Utility */
+.wg-text-primary   { color: var(--wg-text-primary) !important; }
+.wg-text-secondary { color: var(--wg-text-secondary) !important; }
+.wg-text-muted     { color: var(--wg-text-muted) !important; }
+.wg-text-art       { color: var(--wg-art) !important; }
+.wg-text-danger    { color: var(--wg-danger) !important; }
+.wg-text-success   { color: var(--wg-success) !important; }
+.wg-text-warning   { color: var(--wg-warning) !important; }
+.wg-text-center    { text-align: center !important; }
+.wg-text-right     { text-align: right !important; }
+.wg-text-left      { text-align: left !important; }
+.wg-text-bold      { font-weight: 700 !important; }
+.wg-text-semibold  { font-weight: 600 !important; }
+.wg-text-upper     { text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* ════════════════════════════════════════════════════════════
+   4. BUTTONS
+════════════════════════════════════════════════════════════ */
+
+.wg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wg-space-2);
+  padding: 0 var(--wg-space-5);
+  height: 42px;
+  border-radius: 999px;  /* pill — matches the capsule feel of the apps */
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--wg-text-sm);
+  font-weight: 700;
+  color: var(--wg-text-primary);
+  background-color: var(--wg-btn);
+  box-shadow: var(--wg-btn-shadow);
+  text-decoration: none;
+  transition: box-shadow var(--wg-transition);
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.wg-btn:hover  { box-shadow: var(--wg-btn-hover); }
+.wg-btn:active { box-shadow: var(--wg-btn-active); }
+.wg-btn:disabled, .wg-btn[disabled] {
+  opacity: 0.45; cursor: not-allowed; pointer-events: none;
+}
+
+/* Sizes */
+.wg-btn-sm { height: 32px; padding: 0 var(--wg-space-4); font-size: var(--wg-text-xs); }
+.wg-btn-lg { height: 52px; padding: 0 var(--wg-space-6); font-size: var(--wg-text-base); }
+
+/* Shape variants */
+.wg-btn-circle {
+  width: 42px; height: 42px;
+  min-width: 42px !important;   /* match so width = height = circle */
+  border-radius: 50% !important;
+  padding: 0;
+  flex-shrink: 0;
+}
+.wg-btn-circle.wg-btn-lg { width: 52px; height: 52px; min-width: 52px !important; }
+.wg-btn-circle.wg-btn-sm { width: 32px; height: 32px; min-width: 32px !important; }
+
+.wg-btn-square {
+  width: 45px; height: 45px;
+  min-width: 45px !important;
+  border-radius: var(--wg-radius-btn) !important;
+  padding: 0;
+  flex-shrink: 0;
+}
+.wg-btn-square.wg-btn-lg { width: 54px; height: 54px; min-width: 54px !important; }
+.wg-btn-square.wg-btn-sm { width: 32px; height: 32px; min-width: 32px !important; }
+
+/* Semantic variants */
+.wg-btn-surface  { background-color: var(--wg-surface); }
+.wg-btn-surface2 { background-color: var(--wg-surface2); }
+.wg-btn-danger   { background-color: var(--wg-danger); }
+.wg-btn-success  { background-color: var(--wg-success); }
+.wg-btn-warning  { background-color: var(--wg-warning); }
+.wg-btn-ghost    {
+  background-color: transparent;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35);
+}
+.wg-btn-ghost:hover { background-color: rgba(255,255,255,0.08); box-shadow: inset 0 0 0 2px rgba(255,255,255,0.55); }
+
+/* ════════════════════════════════════════════════════════════
+   5. CARD
+════════════════════════════════════════════════════════════ */
+
+.wg-card {
+  background-color: var(--wg-card);
+  border-radius: var(--wg-radius-card);
+  box-shadow: var(--wg-card-shadow);
+  overflow: hidden;
+}
+
+.wg-card-body    { padding: var(--wg-space-5); }
+.wg-card-header  {
+  padding: var(--wg-space-4) var(--wg-space-5);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  font-weight: 700;
+  font-size: var(--wg-text-base);
+}
+.wg-card-footer  {
+  padding: var(--wg-space-4) var(--wg-space-5);
+  border-top: 1px solid rgba(255,255,255,0.12);
+  font-size: var(--wg-text-sm);
+  color: var(--wg-text-secondary);
+}
+.wg-card-title   { font-size: var(--wg-text-lg); font-weight: 700; margin-bottom: var(--wg-space-2); }
+.wg-card-text    { color: var(--wg-text-secondary); font-size: var(--wg-text-sm); line-height: 1.65; }
+
+/* Hover lift variant */
+.wg-card-hover {
+  transition: box-shadow var(--wg-transition), transform var(--wg-transition);
+}
+.wg-card-hover:hover {
+  box-shadow: 1px 2px 6px -1px var(--wg-shadow-color, rgba(0,0,0,0.2));
+  transform: translateY(2px);
+}
+
+/* ════════════════════════════════════════════════════════════
+   6. FORMS
+════════════════════════════════════════════════════════════ */
+
+.wg-form-group { margin-bottom: var(--wg-space-5); }
+
+.wg-label {
+  display: block;
+  font-size: var(--wg-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--wg-art);
+  margin-bottom: var(--wg-space-2);
+}
+
+/* Base input — inset shadow like the calculator display */
+.wg-input,
+.wg-select,
+.wg-textarea {
+  display: block;
+  width: 100%;
+  background-color: var(--wg-inset);
+  border: none;
+  border-radius: 10px;   /* fixed px — 3% was asymmetric on wide inputs */
+  padding: 0 var(--wg-space-4);
+  height: 42px;
+  font-size: var(--wg-text-sm);
+  font-weight: 600;
+  color: var(--wg-text-primary);
+  box-shadow: var(--wg-inset-shadow);
+  outline: none;
+  transition: box-shadow var(--wg-transition);
+  font-family: inherit;
+}
+.wg-input::placeholder,
+.wg-textarea::placeholder { color: var(--wg-text-muted); font-weight: 400; }
+.wg-input:focus,
+.wg-select:focus,
+.wg-textarea:focus {
+  box-shadow: var(--wg-inset-shadow), 0 0 0 2px rgba(255,255,255,0.35);
+}
+
+.wg-textarea {
+  height: auto;
+  min-height: 100px;
+  padding: var(--wg-space-3) var(--wg-space-4);
+  resize: vertical;
+  border-radius: 10px;
+}
+
+.wg-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.5)' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--wg-space-4) center;
+  padding-right: var(--wg-space-7);
+  cursor: pointer;
+}
+
+.wg-select option { background: #222; color: white; }
+
+/* Input validation states */
+.wg-input-error { box-shadow: var(--wg-inset-shadow), 0 0 0 2px var(--wg-danger); }
+.wg-input-success { box-shadow: var(--wg-inset-shadow), 0 0 0 2px var(--wg-success); }
+.wg-form-error { font-size: var(--wg-text-xs); color: var(--wg-danger); margin-top: var(--wg-space-1); font-weight: 600; }
+
+/* Checkbox & Radio */
+.wg-check-label {
+  display: flex;
+  align-items: center;
+  gap: var(--wg-space-3);
+  cursor: pointer;
+  font-size: var(--wg-text-sm);
+  font-weight: 600;
+  color: var(--wg-text-primary);
+  user-select: none;
+}
+.wg-check-box {
+  width: 22px; height: 22px;
+  border-radius: 50%;   /* circular */
+  background: var(--wg-inset);
+  box-shadow: var(--wg-inset-shadow);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background var(--wg-transition), box-shadow var(--wg-transition);
+}
+.wg-check-box.checked {
+  background: var(--wg-success);
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+}
+.wg-check-box svg { display: none; }
+.wg-check-box.checked svg { display: block; }
+
+/* Toggle / Switch */
+.wg-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  gap: var(--wg-space-3);
+}
+.wg-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+.wg-toggle-track {
+  width: 46px; height: 26px;
+  border-radius: 13px;
+  background: var(--wg-inset);
+  box-shadow: var(--wg-inset-shadow);
+  position: relative;
+  transition: background var(--wg-transition);
+  flex-shrink: 0;
+}
+.wg-toggle-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+  transition: transform 0.18s ease;
+}
+.wg-toggle input:checked ~ .wg-toggle-track { background: var(--wg-success); }
+.wg-toggle input:checked ~ .wg-toggle-track .wg-toggle-thumb { transform: translateX(20px); }
+.wg-toggle-label { font-size: var(--wg-text-sm); font-weight: 600; color: var(--wg-text-primary); }
+
+/* Range slider */
+.wg-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--wg-inset);
+  box-shadow: var(--wg-inset-shadow);
+  outline: none;
+  cursor: pointer;
+}
+.wg-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--wg-btn);
+  box-shadow: var(--wg-btn-shadow);
+  cursor: pointer;
+  transition: box-shadow var(--wg-transition);
+}
+.wg-range::-webkit-slider-thumb:hover { box-shadow: var(--wg-btn-hover); }
+.wg-range::-moz-range-thumb {
+  width: 22px; height: 22px;
+  border-radius: 50%; border: none;
+  background: var(--wg-btn);
+  box-shadow: var(--wg-btn-shadow);
+  cursor: pointer;
+}
+
+/* ════════════════════════════════════════════════════════════
+   7. NAVBAR
+════════════════════════════════════════════════════════════ */
+
+.wg-nav {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background-color: var(--wg-card);
+  box-shadow: 0 2px 12px var(--wg-shadow-color, rgba(0,0,0,0.3));
+  display: flex;
+  align-items: center;
+  padding: 0 var(--wg-space-5);
+  height: 54px;
+  gap: var(--wg-space-4);
+}
+
+.wg-nav-brand {
+  font-size: var(--wg-text-base);
+  font-weight: 700;
+  color: var(--wg-art);
+  text-decoration: none;
+  white-space: nowrap;
+  margin-right: auto;
+  letter-spacing: 0.02em;
+}
+
+.wg-nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--wg-space-2);
+}
+
+.wg-nav-link {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px;
+  border-radius: 50%;   /* fully circular — icon buttons are always square */
+  background: var(--wg-btn);
+  color: var(--wg-text-primary);
+  text-decoration: none;
+  font-size: var(--wg-text-sm);
+  font-weight: 600;
+  box-shadow: var(--wg-btn-shadow);
+  transition: box-shadow var(--wg-transition);
+  border: none; cursor: pointer; font-family: inherit;
+}
+.wg-nav-link:hover  { box-shadow: var(--wg-btn-hover); }
+.wg-nav-link:active { box-shadow: var(--wg-btn-active); }
+.wg-nav-link.wg-nav-link-wide {
+  width: auto; padding: 0 var(--wg-space-4); border-radius: 999px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   8. BADGE & CHIP
+════════════════════════════════════════════════════════════ */
+
+.wg-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--wg-text-xs);
+  font-weight: 700;
+  color: white;
+  background: var(--wg-btn);
+  border-radius: 20px;
+  padding: 3px 9px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.wg-badge-danger  { background: var(--wg-danger); }
+.wg-badge-success { background: var(--wg-success); }
+.wg-badge-warning { background: var(--wg-warning); color: #111; }
+.wg-badge-surface { background: var(--wg-surface); }
+.wg-badge-dot::before {
+  content: "●";
+  font-size: 8px;
+  line-height: 1;
+}
+
+.wg-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wg-space-2);
+  font-size: var(--wg-text-sm);
+  font-weight: 600;
+  color: white;
+  background: var(--wg-btn);
+  border-radius: var(--wg-radius-chip);   /* 15% — square-ish chips */
+  padding: 5px 12px;
+  box-shadow: var(--wg-btn-shadow);
+  cursor: default;
+  white-space: nowrap;
+  transition: box-shadow var(--wg-transition);
+}
+.wg-chip-surface  { background: var(--wg-surface); }
+.wg-chip-surface2 { background: var(--wg-surface2); box-shadow: var(--wg-inset-shadow); }
+.wg-chip-inset    { background: var(--wg-inset); box-shadow: var(--wg-inset-shadow); }
+
+/* ════════════════════════════════════════════════════════════
+   9. ALERT
+════════════════════════════════════════════════════════════ */
+
+.wg-alert {
+  border-radius: 10px;
+  padding: var(--wg-space-4) var(--wg-space-5);
+  font-size: var(--wg-text-sm);
+  font-weight: 600;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--wg-space-3);
+  box-shadow: var(--wg-card-shadow);
+  background: var(--wg-card);
+  color: var(--wg-text-primary);
+}
+.wg-alert-icon  { flex-shrink: 0; margin-top: 1px; font-size: 16px; }
+.wg-alert-body  { flex: 1; }
+.wg-alert-title { font-weight: 700; margin-bottom: var(--wg-space-1); }
+.wg-alert-text  { font-weight: 400; opacity: 0.75; font-size: var(--wg-text-xs); margin-top: 2px; }
+
+/* Solid full-colour alerts — saturated background, white text */
+.wg-alert-danger {
+  background: var(--wg-danger);
+  box-shadow: 3px 6px 8px -1px hsla(355,50%,25%,0.55);
+  color: white;
+}
+.wg-alert-success {
+  background: var(--wg-success);
+  box-shadow: 3px 6px 8px -1px hsla(158,45%,18%,0.55);
+  color: white;
+}
+.wg-alert-warning {
+  background: var(--wg-warning);
+  box-shadow: 3px 6px 8px -1px hsla(38,70%,22%,0.55);
+  color: white;
+}
+.wg-alert-info {
+  background: var(--wg-info);
+  box-shadow: 3px 6px 8px -1px hsla(205,50%,20%,0.55);
+  color: white;
+}
+
+/* Dismissible */
+.wg-alert-close {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  border-radius: 50%;
+  width: 24px; height: 24px;
+  cursor: pointer;
+  color: white;
+  opacity: 0.8;
+  padding: 0;
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity var(--wg-transition), background var(--wg-transition);
+}
+.wg-alert-close:hover { opacity: 1; background: rgba(255,255,255,0.3); }
+.wg-alert.wg-alert-dismissed { display: none; }
+
+/* ════════════════════════════════════════════════════════════
+   10. AVATAR
+════════════════════════════════════════════════════════════ */
+
+.wg-avatar {
+  width: 48px; height: 48px;
+  border-radius: var(--wg-radius-btn);     /* soft-square */
+  background: var(--wg-inset);
+  box-shadow: var(--wg-inset-shadow);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  font-size: var(--wg-text-base);
+  font-weight: 700;
+  color: var(--wg-art);
+}
+.wg-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.wg-avatar-sm  { width: 32px; height: 32px; font-size: var(--wg-text-sm); }
+.wg-avatar-lg  { width: 72px; height: 72px; font-size: var(--wg-text-xl); }
+.wg-avatar-circle { border-radius: var(--wg-radius-circle); }
+
+/* Avatar group */
+.wg-avatar-group { display: flex; }
+.wg-avatar-group .wg-avatar { margin-left: -10px; border: 2px solid var(--wg-card); }
+.wg-avatar-group .wg-avatar:first-child { margin-left: 0; }
+
+/* ════════════════════════════════════════════════════════════
+   11. TABS
+════════════════════════════════════════════════════════════ */
+
+.wg-tabs { display: flex; flex-direction: column; }
+
+.wg-tab-list {
+  display: flex;
+  gap: var(--wg-space-2);
+  padding: var(--wg-space-2);
+  background: var(--wg-inset);
+  box-shadow: var(--wg-inset-shadow);
+  border-radius: var(--wg-radius-wide);
+  overflow-x: auto;
+}
+
+.wg-tab-btn {
+  flex: 1;
+  min-width: 80px;
+  padding: var(--wg-space-2) var(--wg-space-4);
+  border: none;
+  background: none;
+  color: var(--wg-text-secondary);
+  font-family: inherit;
+  font-size: var(--wg-text-sm);
+  font-weight: 700;
+  border-radius: var(--wg-radius-wide);
+  cursor: pointer;
+  transition: background var(--wg-transition), box-shadow var(--wg-transition), color var(--wg-transition);
+  white-space: nowrap;
+}
+.wg-tab-btn:hover { color: var(--wg-text-primary); background: rgba(255,255,255,0.1); }
+.wg-tab-btn.active {
+  background: var(--wg-btn);
+  color: var(--wg-text-primary);
+  box-shadow: var(--wg-btn-shadow);
+}
+
+.wg-tab-panels { margin-top: var(--wg-space-4); }
+.wg-tab-panel  { display: none; }
+.wg-tab-panel.active { display: block; }
+
+/* ════════════════════════════════════════════════════════════
+   12. DROPDOWN
+════════════════════════════════════════════════════════════ */
+
+.wg-dropdown { position: relative; display: inline-block; }
+
+.wg-dropdown-menu {
+  position: absolute;
+  top: calc(100% + var(--wg-space-2));
+  left: 0;
+  min-width: 180px;
+  background: var(--wg-card);
+  border-radius: var(--wg-radius-wide);
+  box-shadow: var(--wg-card-shadow);
+  padding: var(--wg-space-2);
+  z-index: 300;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+}
+.wg-dropdown-menu.open { display: flex; }
+.wg-dropdown-menu.right { left: auto; right: 0; }
+
+.wg-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--wg-space-3);
+  padding: var(--wg-space-2) var(--wg-space-3);
+  border-radius: var(--wg-radius-wide);
+  font-size: var(--wg-text-sm);
+  font-weight: 600;
+  color: var(--wg-text-primary);
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
+  transition: background var(--wg-transition);
+}
+.wg-dropdown-item:hover { background: var(--wg-surface); }
+.wg-dropdown-item.danger { color: var(--wg-danger); }
+.wg-dropdown-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+  margin: var(--wg-space-2) 0;
+}
+
+/* ════════════════════════════════════════════════════════════
+   13. MODAL
+════════════════════════════════════════════════════════════ */
+
+.wg-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 400;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--wg-space-5);
+  backdrop-filter: blur(2px);
+}
+.wg-modal-overlay.open { display: flex; }
+
+.wg-modal {
+  background: var(--wg-card);
+  border-radius: var(--wg-radius-card);
+  box-shadow: 0 16px 48px var(--wg-shadow-color, rgba(0,0,0,0.4));
+  width: 100%;
+  max-width: 480px;
+  overflow: hidden;
+  animation: wg-modal-in 0.18s ease-out;
+}
+@keyframes wg-modal-in {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.wg-modal-header {
+  padding: var(--wg-space-5);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: var(--wg-text-lg);
+}
+.wg-modal-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;   /* circular icon button */
+  background: var(--wg-surface);
+  border: none; cursor: pointer;
+  color: var(--wg-text-primary);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--wg-btn-shadow);
+  transition: box-shadow var(--wg-transition);
+  font-size: 16px; font-weight: 700;
+}
+.wg-modal-close:hover  { box-shadow: var(--wg-btn-hover); }
+.wg-modal-close:active { box-shadow: var(--wg-btn-active); }
+
+.wg-modal-body   { padding: var(--wg-space-5); color: var(--wg-text-secondary); font-size: var(--wg-text-sm); line-height: 1.7; }
+.wg-modal-footer { padding: var(--wg-space-4) var(--wg-space-5); border-top: 1px solid rgba(255,255,255,0.12); display: flex; gap: var(--wg-space-3); justify-content: flex-end; }
+
+/* ════════════════════════════════════════════════════════════
+   14. TOAST / SNACKBAR
+════════════════════════════════════════════════════════════ */
+
+.wg-toast-container {
+  position: fixed;
+  bottom: var(--wg-space-5);
+  right: var(--wg-space-5);
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wg-space-3);
+  pointer-events: none;
+}
+
+.wg-toast {
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  gap: var(--wg-space-3);
+  background: var(--wg-card);
+  border-radius: var(--wg-radius-wide);
+  box-shadow: var(--wg-card-shadow);
+  padding: var(--wg-space-3) var(--wg-space-4);
+  font-size: var(--wg-text-sm);
+  font-weight: 600;
+  color: var(--wg-text-primary);
+  min-width: 220px;
+  max-width: 360px;
+  animation: wg-toast-in 0.2s ease-out;
+}
+@keyframes wg-toast-in {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.wg-toast.wg-toast-out {
+  animation: wg-toast-out 0.2s ease-in forwards;
+}
+@keyframes wg-toast-out {
+  to { opacity: 0; transform: translateX(20px); }
+}
+.wg-toast-icon { flex-shrink: 0; font-size: 16px; }
+.wg-toast-msg  { flex: 1; }
+
+.wg-toast-danger  { border-left: 3px solid var(--wg-danger);  }
+.wg-toast-success { border-left: 3px solid var(--wg-success); }
+.wg-toast-warning { border-left: 3px solid var(--wg-warning); }
+
+/* ════════════════════════════════════════════════════════════
+   15. TOOLTIP
+════════════════════════════════════════════════════════════ */
+
+[data-wg-tip] { position: relative; cursor: default; }
+[data-wg-tip]::after {
+  content: attr(data-wg-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--wg-card);
+  color: var(--wg-text-primary);
+  font-size: var(--wg-text-xs);
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: var(--wg-radius-btn);   /* soft-square tooltip */
+  box-shadow: var(--wg-card-shadow);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+  z-index: 600;
+}
+[data-wg-tip]:hover::after { opacity: 1; }
+
+/* ════════════════════════════════════════════════════════════
+   16. PROGRESS BAR
+════════════════════════════════════════════════════════════ */
+
+.wg-progress {
+  width: 100%;
+  height: 12px;
+  background: var(--wg-inset);
+  border-radius: 6px;
+  box-shadow: var(--wg-inset-shadow);
+  overflow: hidden;
+}
+.wg-progress-bar {
+  height: 100%;
+  background: var(--wg-btn);
+  border-radius: 6px;
+  transition: width 0.3s ease;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+}
+.wg-progress-bar.danger  { background: var(--wg-danger); }
+.wg-progress-bar.success { background: var(--wg-success); }
+.wg-progress-bar.warning { background: var(--wg-warning); }
+
+/* Labeled progress */
+.wg-progress-labeled {
+  display: flex;
+  align-items: center;
+  gap: var(--wg-space-3);
+}
+.wg-progress-labeled .wg-progress { flex: 1; }
+.wg-progress-val {
+  font-size: var(--wg-text-xs);
+  font-weight: 700;
+  color: var(--wg-art);
+  min-width: 36px;
+  text-align: right;
+}
+
+/* ════════════════════════════════════════════════════════════
+   17. TABLE
+════════════════════════════════════════════════════════════ */
+
+.wg-table-wrap {
+  border-radius: var(--wg-radius-wide);
+  overflow: hidden;
+  box-shadow: var(--wg-card-shadow);
+}
+
+.wg-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--wg-text-sm);
+  background: var(--wg-card);
+}
+.wg-table thead th {
+  padding: var(--wg-space-3) var(--wg-space-4);
+  text-align: left;
+  font-size: var(--wg-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--wg-art);
+  background: var(--wg-surface);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.wg-table tbody td {
+  padding: var(--wg-space-3) var(--wg-space-4);
+  color: var(--wg-text-secondary);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.wg-table tbody tr:last-child td { border-bottom: none; }
+.wg-table tbody tr:nth-child(even) td { background: rgba(255,255,255,0.04); }
+.wg-table tbody tr:hover td { background: rgba(255,255,255,0.07); }
+
+/* ════════════════════════════════════════════════════════════
+   18. DIVIDER
+════════════════════════════════════════════════════════════ */
+
+.wg-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+  border: none;
+  margin: var(--wg-space-5) 0;
+}
+.wg-divider-label {
+  display: flex;
+  align-items: center;
+  gap: var(--wg-space-3);
+  color: var(--wg-art);
+  font-size: var(--wg-text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: var(--wg-space-5) 0;
+}
+.wg-divider-label::before,
+.wg-divider-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+}
+
+/* ════════════════════════════════════════════════════════════
+   19. BREADCRUMB
+════════════════════════════════════════════════════════════ */
+
+.wg-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--wg-space-2);
+  font-size: var(--wg-text-xs);
+  font-weight: 700;
+  flex-wrap: wrap;
+}
+.wg-breadcrumb-item { color: var(--wg-text-secondary); text-decoration: none; }
+.wg-breadcrumb-item:hover { color: var(--wg-text-primary); }
+.wg-breadcrumb-item.active { color: var(--wg-text-primary); cursor: default; }
+.wg-breadcrumb-sep { color: var(--wg-text-muted); }
+
+/* ════════════════════════════════════════════════════════════
+   20. LIST GROUP
+════════════════════════════════════════════════════════════ */
+
+.wg-list {
+  background: var(--wg-card);
+  border-radius: var(--wg-radius-wide);
+  box-shadow: var(--wg-card-shadow);
+  overflow: hidden;
+}
+.wg-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--wg-space-3);
+  padding: var(--wg-space-3) var(--wg-space-4);
+  font-size: var(--wg-text-sm);
+  font-weight: 600;
+  color: var(--wg-text-secondary);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  transition: background var(--wg-transition);
+}
+.wg-list-item:last-child { border-bottom: none; }
+.wg-list-item:hover { background: rgba(255,255,255,0.05); color: var(--wg-text-primary); }
+.wg-list-item.active { background: var(--wg-surface); color: var(--wg-text-primary); }
+.wg-list-item-end { margin-left: auto; }
+
+/* ════════════════════════════════════════════════════════════
+   21. SPINNER
+════════════════════════════════════════════════════════════ */
+
+.wg-spinner {
+  display: inline-block;
+  width: 28px; height: 28px;
+  border: 3px solid rgba(255,255,255,0.2);
+  border-top-color: var(--wg-text-primary);
+  border-radius: 50%;
+  animation: wg-spin 0.7s linear infinite;
+}
+.wg-spinner-sm { width: 18px; height: 18px; border-width: 2px; }
+.wg-spinner-lg { width: 42px; height: 42px; border-width: 4px; }
+@keyframes wg-spin { to { transform: rotate(360deg); } }
+
+/* ════════════════════════════════════════════════════════════
+   22. EMPTY STATE
+════════════════════════════════════════════════════════════ */
+
+.wg-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--wg-space-8) var(--wg-space-5);
+  text-align: center;
+  color: var(--wg-art);
+}
+.wg-empty-icon { font-size: 40px; margin-bottom: var(--wg-space-4); opacity: 0.6; }
+.wg-empty-title { font-size: var(--wg-text-base); font-weight: 700; margin-bottom: var(--wg-space-2); }
+.wg-empty-text  { font-size: var(--wg-text-sm); opacity: 0.7; max-width: 280px; }
+
+/* ════════════════════════════════════════════════════════════
+   23. SPACING UTILITIES
+════════════════════════════════════════════════════════════ */
+
+.wg-m-0  { margin: 0 !important; }
+.wg-mt-1 { margin-top:    var(--wg-space-1) !important; }
+.wg-mt-2 { margin-top:    var(--wg-space-2) !important; }
+.wg-mt-3 { margin-top:    var(--wg-space-3) !important; }
+.wg-mt-4 { margin-top:    var(--wg-space-4) !important; }
+.wg-mt-5 { margin-top:    var(--wg-space-5) !important; }
+.wg-mt-6 { margin-top:    var(--wg-space-6) !important; }
+.wg-mb-1 { margin-bottom: var(--wg-space-1) !important; }
+.wg-mb-2 { margin-bottom: var(--wg-space-2) !important; }
+.wg-mb-3 { margin-bottom: var(--wg-space-3) !important; }
+.wg-mb-4 { margin-bottom: var(--wg-space-4) !important; }
+.wg-mb-5 { margin-bottom: var(--wg-space-5) !important; }
+.wg-mb-6 { margin-bottom: var(--wg-space-6) !important; }
+.wg-ml-auto { margin-left: auto !important; }
+.wg-mr-auto { margin-right: auto !important; }
+.wg-p-0  { padding: 0 !important; }
+.wg-p-3  { padding: var(--wg-space-3) !important; }
+.wg-p-4  { padding: var(--wg-space-4) !important; }
+.wg-p-5  { padding: var(--wg-space-5) !important; }
+.wg-px-4 { padding-left: var(--wg-space-4) !important; padding-right: var(--wg-space-4) !important; }
+.wg-py-4 { padding-top:  var(--wg-space-4) !important; padding-bottom: var(--wg-space-4) !important; }
+.wg-gap-2 { gap: var(--wg-space-2) !important; }
+.wg-gap-3 { gap: var(--wg-space-3) !important; }
+.wg-gap-4 { gap: var(--wg-space-4) !important; }
+.wg-gap-5 { gap: var(--wg-space-5) !important; }
+
+/* ════════════════════════════════════════════════════════════
+   24. DISPLAY & FLEX UTILITIES
+════════════════════════════════════════════════════════════ */
+
+.wg-d-flex    { display: flex !important; }
+.wg-d-grid    { display: grid !important; }
+.wg-d-block   { display: block !important; }
+.wg-d-none    { display: none !important; }
+.wg-flex-col  { flex-direction: column !important; }
+.wg-flex-wrap { flex-wrap: wrap !important; }
+.wg-align-center   { align-items: center !important; }
+.wg-align-start    { align-items: flex-start !important; }
+.wg-align-end      { align-items: flex-end !important; }
+.wg-justify-center { justify-content: center !important; }
+.wg-justify-between{ justify-content: space-between !important; }
+.wg-justify-end    { justify-content: flex-end !important; }
+.wg-w-full    { width: 100% !important; }
+.wg-w-auto    { width: auto !important; }
+
+/* ════════════════════════════════════════════════════════════
+   25. RESPONSIVE VISIBILITY
+════════════════════════════════════════════════════════════ */
+
+@media (max-width: 575px) {
+  .wg-hidden-xs { display: none !important; }
+}
+@media (max-width: 767px) {
+  .wg-hidden-sm { display: none !important; }
+}
+@media (min-width: 768px) {
+  .wg-visible-sm { display: none !important; }
+}
+@media (max-width: 1023px) {
+  .wg-hidden-md { display: none !important; }
+}
+@media (min-width: 1024px) {
+  .wg-visible-md { display: none !important; }
+}
+
+/* ════════════════════════════════════════════════════════════
+   26. REDUCED MOTION
+════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+  </style>
+<style>
+    /* ── Google Fonts ── */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    /* ── Docs-specific styles — mobile first ── */
+
+    /* Apply nicer fonts to the docs shell only, not component demos */
+    .docs-sidebar, .docs-main, .wg-nav {
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    /* ── Layout ── */
+    .docs-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar — hidden on mobile, visible ≥768 */
+    .docs-sidebar {
+      display: none;
+    }
+    @media (min-width: 768px) {
+      .docs-sidebar {
+        display: flex;
+        width: 210px;
+        flex-shrink: 0;
+        background: var(--wg-card);
+        box-shadow: 2px 0 12px var(--wg-shadow-color, rgba(0,0,0,0.2));
+        position: sticky;
+        top: 54px;
+        height: calc(100vh - 54px);
+        overflow-y: auto;
+        padding: 20px 0;
+        flex-direction: column;
+        gap: 2px;
+        transition: background 0.2s;
+      }
+    }
+    .docs-sidebar::-webkit-scrollbar { width: 4px; }
+    .docs-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+    .docs-nav-section {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--wg-art);
+      padding: 14px 20px 6px;
+    }
+    .docs-nav-link {
+      display: block;
+      padding: 7px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--wg-text-secondary);
+      text-decoration: none;
+      border-left: 3px solid transparent;
+      transition: color 0.1s, border-color 0.1s, background 0.1s;
+    }
+    .docs-nav-link:hover  { color: var(--wg-text-primary); background: rgba(255,255,255,0.06); }
+    .docs-nav-link.active { color: var(--wg-text-primary); border-left-color: var(--wg-btn); background: rgba(255,255,255,0.06); font-weight: 600; }
+
+    /* ── Nav brand upgrade ── */
+    .wg-nav-brand {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    /* Main content */
+    .docs-main {
+      flex: 1;
+      min-width: 0;
+      padding: 28px 16px 60px;
+      max-width: 100%;
+    }
+    @media (min-width: 768px) {
+      .docs-main {
+        padding: 48px 40px 80px;
+        max-width: 860px;
+      }
+    }
+
+    /* ── Sections ── */
+    .docs-section {
+      margin-bottom: 56px;
+      scroll-margin-top: 70px;
+    }
+    .docs-section-title {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--wg-card);
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+    @media (min-width: 768px) {
+      .docs-section-title { font-size: 24px; }
+    }
+    .docs-section-sub {
+      font-size: 13px;
+      color: #777;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 2px solid var(--wg-card);
+      line-height: 1.65;
+    }
+
+    /* ── Demo boxes ── */
+    .demo-box {
+      background: var(--wg-card);
+      border-radius: 8px;
+      padding: 20px 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--wg-card-shadow);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      transition: background 0.2s, box-shadow 0.2s;
+      overflow: hidden;
+    }
+    @media (min-width: 768px) {
+      .demo-box { padding: 24px; gap: 16px; }
+    }
+    .demo-box-col { flex-direction: column; align-items: flex-start; }
+    .demo-box > * { max-width: 100%; }
+
+    /* ── Code blocks — dark, high contrast ── */
+    .code-block {
+      background: #0f1117;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.75;
+      color: #e2e8f0;
+      overflow-x: auto;
+      margin-bottom: 24px;
+      position: relative;
+      -webkit-overflow-scrolling: touch;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    @media (min-width: 768px) {
+      .code-block { font-size: 12.5px; padding: 18px 22px; }
+    }
+    .code-block pre { white-space: pre; min-width: max-content; margin: 0; }
+    .code-block .kw  { color: #7dd3fc; }            /* tags — sky blue */
+    .code-block .at  { color: #86efac; }            /* attributes — green */
+    .code-block .st  { color: #fca5a5; }            /* strings — rose */
+    .code-block .cm  { color: #475569; font-style: italic; } /* comments */
+
+    .copy-btn {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      cursor: pointer;
+      transition: background 0.1s, color 0.1s;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.14); color: #e2e8f0; }
+
+    /* ── Hero — upgraded ── */
+    .docs-hero {
+      margin-bottom: 44px;
+      padding-bottom: 36px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    .docs-hero .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--wg-card);
+      opacity: 0.7;
+      margin-bottom: 12px;
+    }
+    .docs-hero h1 {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      color: #0f172a;
+      margin-bottom: 14px;
+    }
+    .docs-hero h1 .version {
+      font-weight: 400;
+      color: var(--wg-card);
+      opacity: 0.35;
+      font-size: 0.75em;
+      letter-spacing: -0.01em;
+    }
+    @media (min-width: 640px) {
+      .docs-hero h1 { font-size: 48px; }
+    }
+    .docs-hero .tagline {
+      font-size: 15px;
+      color: #64748b;
+      max-width: 480px;
+      line-height: 1.7;
+      margin-bottom: 24px;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    /* Install codes — dark pill, high contrast */
+    .install-codes {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    @media (min-width: 640px) {
+      .install-codes { flex-direction: column; }
+    }
+    .install-code-line {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #0f1117;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #e2e8f0;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+    }
+    .install-code-line .ic-tag  { color: #7dd3fc; }  /* sky — tag names */
+    .install-code-line .ic-attr { color: #86efac; }  /* green — attributes */
+    .install-code-line .ic-val  { color: #fca5a5; }  /* rose — values */
+    .install-code-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #334155;
+      min-width: 16px;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    /* ── Theme panel ── */
+    .theme-panel {
+      background: var(--wg-card);
+      border-radius: 8px;
+      padding: 20px 16px;
+      box-shadow: var(--wg-card-shadow);
+      margin-bottom: 28px;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    @media (min-width: 768px) {
+      .theme-panel { padding: 24px; }
+    }
+
+    .hue-slider-wrap {
+      position: relative;
+      margin: 16px 0;
+    }
+    .hue-bar {
+      height: 14px;
+      border-radius: 7px;
+      background: linear-gradient(to right,
+        hsl(0,70%,45%),   hsl(30,70%,45%),  hsl(60,70%,45%),
+        hsl(90,70%,35%),  hsl(120,70%,35%), hsl(150,70%,35%),
+        hsl(180,65%,38%), hsl(210,70%,42%), hsl(240,55%,42%),
+        hsl(270,60%,42%), hsl(300,60%,40%), hsl(330,65%,42%), hsl(360,70%,45%)
+      );
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
+      cursor: pointer;
+    }
+    #hueSlider {
+      position: absolute;
+      top: -4px; left: 0;
+      width: 100%;
+      margin: 0;
+      opacity: 0;
+      cursor: pointer;
+      height: 22px;
+    }
+    .hue-thumb {
+      position: absolute;
+      top: 50%;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      transition: background 0.05s;
+    }
+
+    .preset-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .preset-btn {
+      height: 32px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.25);
+      transition: box-shadow 0.08s;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .preset-btn:hover  { box-shadow: 1px 1px 4px rgba(0,0,0,0.25); }
+    .preset-btn:active { box-shadow: inset 0 0 16px 6px rgba(0,0,0,0.27); }
+
+    /* ── Token grid ── */
+    .token-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    @media (min-width: 480px) {
+      .token-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    }
+    .token-swatch { border-radius: 8px; overflow: hidden; box-shadow: 2px 3px 8px rgba(0,0,0,0.2); }
+    .token-color  { height: 44px; }
+    .token-info   { background: #0f1117; padding: 8px 10px; }
+    .token-name   { font-size: 10px; font-weight: 700; color: #7dd3fc; font-family: 'JetBrains Mono', monospace; word-break: break-all; }
+    .token-val    { font-size: 9px; color: #475569; font-family: 'JetBrains Mono', monospace; margin-top: 2px; word-break: break-all; }
+
+    /* ── Sat/light controls ── */
+    .sl-controls {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    @media (min-width: 480px) {
+      .sl-controls { grid-template-columns: 1fr 1fr; }
+    }
+    .sl-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--wg-art);
+      margin-bottom: 6px;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    /* ── Grid demo ── */
+    .wg-row > [class*="wg-col-"] { min-width: 0; }
+
+    /* ── Table scroll on mobile ── */
+    .wg-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .wg-table { min-width: 400px; }
+
+    /* ── Card demo row ── */
+    .card-demo-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+    .card-demo-row .wg-card { flex: 1; min-width: 200px; }
+
+    /* ── Forms in demo boxes ── */
+    .demo-box .wg-form-group { width: 100%; max-width: 100%; }
+    @media (min-width: 480px) {
+      .demo-box .wg-form-group { max-width: 360px; }
+    }
+  </style>
+</head>
+<body>
+<!-- ── Navbar ── -->
+<nav class="wg-nav">
+  <span class="wg-nav-brand">widget.css <span style="font-weight:400;opacity:0.5;">v1.0</span></span>
+  <div class="wg-nav-links">
+    <a href="#theme" class="wg-nav-link wg-nav-link-wide">Theme</a>
+    <a href="widget.css" class="wg-btn wg-btn-sm" download>↓ CSS</a>
+    <a href="#" class="wg-nav-link" data-wg-tip="GitHub" aria-label="GitHub">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+    </a>
+  </div>
+</nav>
+
+<div class="docs-layout">
+
+  <!-- ── Sidebar ── -->
+  <aside class="docs-sidebar">
+    <div class="docs-nav-section">Getting Started</div>
+    <a class="docs-nav-link" href="#theme">Theme System</a>
+    <a class="docs-nav-link" href="#tokens">Tokens</a>
+    <a class="docs-nav-link" href="#layout">Grid & Layout</a>
+    <div class="docs-nav-section">Typography</div>
+    <a class="docs-nav-link" href="#typography">Type Scale</a>
+    <div class="docs-nav-section">Components</div>
+    <a class="docs-nav-link" href="#buttons">Buttons</a>
+    <a class="docs-nav-link" href="#cards">Cards</a>
+    <a class="docs-nav-link" href="#forms">Forms</a>
+    <a class="docs-nav-link" href="#navbar">Navbar</a>
+    <a class="docs-nav-link" href="#badges">Badges & Chips</a>
+    <a class="docs-nav-link" href="#alerts">Alerts</a>
+    <a class="docs-nav-link" href="#avatar">Avatar</a>
+    <a class="docs-nav-link" href="#tabs">Tabs</a>
+    <a class="docs-nav-link" href="#dropdown">Dropdown</a>
+    <a class="docs-nav-link" href="#modal">Modal</a>
+    <a class="docs-nav-link" href="#toast">Toast</a>
+    <a class="docs-nav-link" href="#progress">Progress</a>
+    <a class="docs-nav-link" href="#table">Table</a>
+    <a class="docs-nav-link" href="#list">List Group</a>
+    <a class="docs-nav-link" href="#spinner">Spinner</a>
+    <a class="docs-nav-link" href="#empty">Empty State</a>
+    <a class="docs-nav-link" href="#divider">Divider</a>
+    <a class="docs-nav-link" href="#breadcrumb">Breadcrumb</a>
+    <div class="docs-nav-section">Utilities</div>
+    <a class="docs-nav-link" href="#spacing">Spacing</a>
+    <a class="docs-nav-link" href="#utilities">Display & Flex</a>
+  </aside>
+
+  <!-- ── Main docs ── -->
+  <main class="docs-main">
+
+    <!-- Hero -->
+    <div class="docs-hero">
+      <div class="hero-eyebrow">⬡ Component Library</div>
+      <h1>Widget <span class="version">v1</span></h1>
+      <p class="tagline">
+        Pick a hero colour, get a complete UI. Saturated monochromatic
+        theming, tactile shadows, soft-square radii. Zero dependencies.
+      </p>
+      <div class="install-codes">
+        <div class="install-code-line">
+          <span class="install-code-num">1</span>
+          <span><span class="ic-tag">&lt;link</span> <span class="ic-attr">rel</span>=<span class="ic-val">"stylesheet"</span> <span class="ic-attr">href</span>=<span class="ic-val">"widget.css"</span><span class="ic-tag">&gt;</span></span>
+        </div>
+        <div class="install-code-line">
+          <span class="install-code-num">2</span>
+          <span><span class="ic-tag">&lt;script</span> <span class="ic-attr">src</span>=<span class="ic-val">"widget-theme.js"</span><span class="ic-tag">&gt;&lt;/script&gt;</span></span>
+        </div>
+        <div class="install-code-line">
+          <span class="install-code-num">3</span>
+          <span><span class="ic-tag">&lt;script</span> <span class="ic-attr">src</span>=<span class="ic-val">"widget-interact.js"</span><span class="ic-tag">&gt;&lt;/script&gt;</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ THEME SYSTEM ════ -->
+    <section class="docs-section" id="theme">
+      <div class="docs-section-title">Theme System</div>
+      <div class="docs-section-sub">One hero colour generates everything. Drag the slider — every component below updates live.</div>
+
+      <div class="theme-panel">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div class="sl-label" style="margin:0;">Hero Hue</div>
+          <div id="hueDisplay" style="font-size:12px;font-weight:700;color:var(--wg-art);font-family:monospace;"></div>
+        </div>
+
+        <div class="hue-slider-wrap">
+          <div class="hue-bar"></div>
+          <input type="range" id="hueSlider" min="0" max="359" value="240"/>
+          <div class="hue-thumb" id="hueThumb"></div>
+        </div>
+
+        <div class="sl-controls">
+          <div>
+            <div class="sl-label">Saturation <span id="satVal"></span>%</div>
+            <input type="range" class="wg-range" id="satSlider" min="20" max="90" value="55"/>
+          </div>
+          <div>
+            <div class="sl-label">Lightness <span id="litVal"></span>%</div>
+            <input type="range" class="wg-range" id="litSlider" min="20" max="65" value="42"/>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <div class="sl-label">Presets</div>
+          <div class="preset-btns">
+            <button class="preset-btn" style="background:rgb(196,40,62);"  onclick="WidgetTheme.presets.pomodoro(); syncControls();">Pomodoro</button>
+            <button class="preset-btn" style="background:#1093af;"         onclick="WidgetTheme.presets.calculator(); syncControls();">Calculator</button>
+            <button class="preset-btn" style="background:rgb(76,153,0);"   onclick="WidgetTheme.presets.todo(); syncControls();">To-do</button>
+            <button class="preset-btn" style="background:hsl(240,55%,42%);" onclick="WidgetTheme.presets.indigo(); syncControls();">Indigo</button>
+            <button class="preset-btn" style="background:hsl(38,90%,45%);" onclick="WidgetTheme.presets.amber(); syncControls();">Amber</button>
+            <button class="preset-btn" style="background:hsl(340,70%,45%);" onclick="WidgetTheme.presets.rose(); syncControls();">Rose</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <button class="copy-btn" data-wg-copy="#code-theme">Copy</button>
+        <pre id="code-theme"><span class="cm">/* Option 1: CSS var (set before scripts) */</span>
+<span class="kw">&lt;style&gt;</span>:root { --wg-hero-hex: <span class="st">#1093af</span>; }<span class="kw">&lt;/style&gt;</span>
+
+<span class="cm">/* Option 2: JavaScript */</span>
+WidgetTheme.set(<span class="st">240</span>);               <span class="cm">// hue integer</span>
+WidgetTheme.set(<span class="st">'#1093af'</span>);        <span class="cm">// hex</span>
+WidgetTheme.set(<span class="st">'hsl(200,60%,37%)'</span>); <span class="cm">// hsl string</span>
+WidgetTheme.set(<span class="st">240</span>, <span class="st">55</span>, <span class="st">42</span>);       <span class="cm">// hue, sat%, light%</span>
+
+<span class="cm">/* Presets from original apps */</span>
+WidgetTheme.presets.pomodoro();     <span class="cm">// → red</span>
+WidgetTheme.presets.calculator();   <span class="cm">// → teal</span>
+WidgetTheme.presets.todo();         <span class="cm">// → lime</span>
+
+<span class="cm">/* Override individual tokens */</span>
+WidgetTheme.override(<span class="st">'--wg-btn'</span>, <span class="st">'#ff0000'</span>);</pre>
+      </div>
+    </section>
+
+    <!-- ════ TOKENS ════ -->
+    <section class="docs-section" id="tokens">
+      <div class="docs-section-title">Design Tokens</div>
+      <div class="docs-section-sub">All tokens are CSS custom properties. They update live when the theme changes.</div>
+      <div class="token-grid" id="tokenGrid"></div>
+    </section>
+
+    <!-- ════ LAYOUT ════ -->
+    <section class="docs-section" id="layout">
+      <div class="docs-section-title">Grid & Layout</div>
+      <div class="docs-section-sub">12-column flexbox grid. Columns sit side-by-side — they only stack when using responsive breakpoint classes (<code style="background:rgba(0,0,0,0.08);padding:1px 5px;border-radius:4px;font-size:11px;">wg-col-sm-*</code>, <code style="background:rgba(0,0,0,0.08);padding:1px 5px;border-radius:4px;font-size:11px;">wg-col-md-*</code>).</div>
+
+      <div class="demo-box demo-box-col" style="gap:8px; overflow-x:auto;">
+
+        <!-- 12 -->
+        <div class="wg-row" style="width:100%; min-width:280px; flex-wrap:nowrap;">
+          <div class="wg-col-12"><div style="background:var(--wg-surface);border-radius:6px;padding:10px 8px;text-align:center;font-size:11px;font-weight:700;white-space:nowrap;">col-12</div></div>
+        </div>
+
+        <!-- 6 + 6 -->
+        <div class="wg-row" style="width:100%; min-width:280px; flex-wrap:nowrap;">
+          <div class="wg-col-6"><div style="background:var(--wg-surface);border-radius:6px;padding:10px 8px;text-align:center;font-size:11px;font-weight:700;">col-6</div></div>
+          <div class="wg-col-6"><div style="background:var(--wg-surface2);border-radius:6px;padding:10px 8px;text-align:center;font-size:11px;font-weight:700;">col-6</div></div>
+        </div>
+
+        <!-- 4 + 4 + 4 -->
+        <div class="wg-row" style="width:100%; min-width:280px; flex-wrap:nowrap;">
+          <div class="wg-col-4"><div style="background:var(--wg-surface);border-radius:6px;padding:10px 8px;text-align:center;font-size:11px;font-weight:700;">col-4</div></div>
+          <div class="wg-col-4"><div style="background:var(--wg-surface2);border-radius:6px;padding:10px 8px;text-align:center;font-size:11px;font-weight:700;">col-4</div></div>
+          <div class="wg-col-4"><div style="background:var(--wg-surface);border-radius:6px;padding:10px 8px;text-align:center;font-size:11px;font-weight:700;">col-4</div></div>
+        </div>
+
+        <!-- 3 + 3 + 3 + 3 -->
+        <div class="wg-row" style="width:100%; min-width:280px; flex-wrap:nowrap;">
+          <div class="wg-col-3"><div style="background:var(--wg-surface);border-radius:6px;padding:10px 4px;text-align:center;font-size:10px;font-weight:700;">col-3</div></div>
+          <div class="wg-col-3"><div style="background:var(--wg-surface2);border-radius:6px;padding:10px 4px;text-align:center;font-size:10px;font-weight:700;">col-3</div></div>
+          <div class="wg-col-3"><div style="background:var(--wg-surface);border-radius:6px;padding:10px 4px;text-align:center;font-size:10px;font-weight:700;">col-3</div></div>
+          <div class="wg-col-3"><div style="background:var(--wg-surface2);border-radius:6px;padding:10px 4px;text-align:center;font-size:10px;font-weight:700;">col-3</div></div>
+        </div>
+
+        <!-- 8 + 4 -->
+        <div class="wg-row" style="width:100%; min-width:280px; flex-wrap:nowrap;">
+          <div class="wg-col-8"><div style="background:var(--wg-surface2);border-radius:6px;padding:10px 8px;text-align:center;font-size:11px;font-weight:700;">col-8 — main content</div></div>
+          <div class="wg-col-4"><div style="background:var(--wg-surface);border-radius:6px;padding:10px 8px;text-align:center;font-size:11px;font-weight:700;">col-4 — sidebar</div></div>
+        </div>
+
+      </div>
+
+      <div class="code-block">
+        <button class="copy-btn" data-wg-copy="#code-grid">Copy</button>
+        <pre id="code-grid"><span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-container"</span><span class="kw">&gt;</span>
+
+  <span class="cm">&lt;!-- Always side-by-side --&gt;</span>
+  <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-row"</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-col-8"</span><span class="kw">&gt;</span>Main<span class="kw">&lt;/div&gt;</span>
+    <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-col-4"</span><span class="kw">&gt;</span>Sidebar<span class="kw">&lt;/div&gt;</span>
+  <span class="kw">&lt;/div&gt;</span>
+
+  <span class="cm">&lt;!-- Stack on mobile, side-by-side ≥768px --&gt;</span>
+  <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-row"</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-col-12 wg-col-md-6"</span><span class="kw">&gt;</span>Left<span class="kw">&lt;/div&gt;</span>
+    <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-col-12 wg-col-md-6"</span><span class="kw">&gt;</span>Right<span class="kw">&lt;/div&gt;</span>
+  <span class="kw">&lt;/div&gt;</span>
+
+<span class="kw">&lt;/div&gt;</span></pre>
+      </div>
+    </section>
+
+    <!-- ════ TYPOGRAPHY ════ -->
+    <section class="docs-section" id="typography">
+      <div class="docs-section-title">Typography</div>
+      <div class="docs-section-sub">Type scale, weights, and the "art" watermark treatment from the original apps.</div>
+      <div class="demo-box demo-box-col">
+        <div class="wg-h1">Heading 1 — 36px</div>
+        <div class="wg-h2">Heading 2 — 28px</div>
+        <div class="wg-h3">Heading 3 — 22px</div>
+        <div class="wg-h4">Heading 4 — 18px</div>
+        <div class="wg-lead">Lead text — 18px, secondary colour</div>
+        <div>Body text — 15px, primary colour</div>
+        <div class="wg-small wg-text-secondary">Small text — 13px</div>
+        <div class="wg-eyebrow">Eyebrow label</div>
+        <div class="wg-art" style="font-size:28px;">Art / watermark text</div>
+      </div>
+    </section>
+
+    <!-- ════ BUTTONS ════ -->
+    <section class="docs-section" id="buttons">
+      <div class="docs-section-title">Buttons</div>
+      <div class="docs-section-sub">The tactile button system. All share the same shadow depth: resting → hover shrinks → active insets.</div>
+
+      <div class="demo-box">
+        <button class="wg-btn">Default</button>
+        <button class="wg-btn wg-btn-surface">Surface</button>
+        <button class="wg-btn wg-btn-success">Success</button>
+        <button class="wg-btn wg-btn-danger">Danger</button>
+        <button class="wg-btn wg-btn-warning">Warning</button>
+        <button class="wg-btn wg-btn-ghost">Ghost</button>
+        <button class="wg-btn" disabled>Disabled</button>
+      </div>
+
+      <div class="demo-box">
+        <button class="wg-btn wg-btn-sm">Small</button>
+        <button class="wg-btn">Default</button>
+        <button class="wg-btn wg-btn-lg">Large</button>
+      </div>
+
+      <div class="demo-box">
+        <button class="wg-btn wg-btn-circle">+</button>
+        <button class="wg-btn wg-btn-circle">−</button>
+        <button class="wg-btn wg-btn-circle wg-btn-danger">✕</button>
+        <button class="wg-btn wg-btn-circle wg-btn-success">✓</button>
+        <button class="wg-btn wg-btn-square">▶</button>
+        <button class="wg-btn wg-btn-square wg-btn-danger">↺</button>
+        <button class="wg-btn wg-btn-square wg-btn-surface">7</button>
+      </div>
+
+      <div class="code-block">
+        <button class="copy-btn" data-wg-copy="#code-btn">Copy</button>
+        <pre id="code-btn"><span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"wg-btn"</span><span class="kw">&gt;</span>Default<span class="kw">&lt;/button&gt;</span>
+<span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"wg-btn wg-btn-danger"</span><span class="kw">&gt;</span>Danger<span class="kw">&lt;/button&gt;</span>
+<span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"wg-btn wg-btn-sm wg-btn-success"</span><span class="kw">&gt;</span>Small Success<span class="kw">&lt;/button&gt;</span>
+<span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"wg-btn wg-btn-circle"</span><span class="kw">&gt;</span>+<span class="kw">&lt;/button&gt;</span>
+<span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"wg-btn wg-btn-square"</span><span class="kw">&gt;</span>▶<span class="kw">&lt;/button&gt;</span>
+<span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"wg-btn wg-btn-ghost"</span><span class="kw">&gt;</span>Ghost<span class="kw">&lt;/button&gt;</span></pre>
+      </div>
+    </section>
+
+    <!-- ════ CARDS ════ -->
+    <section class="docs-section" id="cards">
+      <div class="docs-section-title">Cards</div>
+      <div class="docs-section-sub">The core container. Uses colored drop shadow — the signature of this design language.</div>
+      <div class="demo-box" style="background:var(--wg-page-bg);">
+        <div class="card-demo-row" style="width:100%;">
+          <div class="wg-card">
+            <div class="wg-card-header">Card Header</div>
+            <div class="wg-card-body">
+              <div class="wg-card-title">Card Title</div>
+              <p class="wg-card-text">Card body text goes here. Coloured drop shadow lifts it off the page.</p>
+            </div>
+            <div class="wg-card-footer">Footer · metadata</div>
+          </div>
+          <div class="wg-card wg-card-hover">
+            <div class="wg-card-body">
+              <div class="wg-card-title">Hover Card</div>
+              <p class="wg-card-text">Hover over me — shadow shrinks and card settles. Feels physical.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <button class="copy-btn" data-wg-copy="#code-card">Copy</button>
+        <pre id="code-card"><span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-card"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-card-header"</span><span class="kw">&gt;</span>Header<span class="kw">&lt;/div&gt;</span>
+  <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-card-body"</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-card-title"</span><span class="kw">&gt;</span>Title<span class="kw">&lt;/div&gt;</span>
+    <span class="kw">&lt;p</span> <span class="at">class</span>=<span class="st">"wg-card-text"</span><span class="kw">&gt;</span>Body text.<span class="kw">&lt;/p&gt;</span>
+  <span class="kw">&lt;/div&gt;</span>
+  <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-card-footer"</span><span class="kw">&gt;</span>Footer<span class="kw">&lt;/div&gt;</span>
+<span class="kw">&lt;/div&gt;</span></pre>
+      </div>
+    </section>
+
+    <!-- ════ FORMS ════ -->
+    <section class="docs-section" id="forms">
+      <div class="docs-section-title">Forms</div>
+      <div class="docs-section-sub">Inputs use inset shadow — they look sunken, like the calculator display screen. Wide elements use border-radius: 3%.</div>
+      <div class="demo-box demo-box-col" style="gap:16px;">
+        <div class="wg-form-group" style="width:100%;max-width:360px;">
+          <label class="wg-label">Your name</label>
+          <input class="wg-input" type="text" placeholder="Alex Rivera"/>
+        </div>
+        <div class="wg-form-group" style="width:100%;max-width:360px;">
+          <label class="wg-label">Category</label>
+          <select class="wg-select">
+            <option>Design</option>
+            <option>Frontend</option>
+            <option>Backend</option>
+          </select>
+        </div>
+        <div class="wg-form-group" style="width:100%;max-width:360px;">
+          <label class="wg-label">Bio</label>
+          <textarea class="wg-textarea" placeholder="Tell us about yourself…"></textarea>
+        </div>
+        <div class="wg-d-flex wg-gap-4 wg-align-center wg-flex-wrap">
+          <label class="wg-check-label">
+            <div class="wg-check-box checked">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            Checked option
+          </label>
+          <label class="wg-check-label">
+            <div class="wg-check-box"></div>
+            Unchecked option
+          </label>
+          <label class="wg-toggle">
+            <input type="checkbox" checked/>
+            <div class="wg-toggle-track"><div class="wg-toggle-thumb"></div></div>
+            <span class="wg-toggle-label">Toggle on</span>
+          </label>
+        </div>
+        <div style="width:100%;max-width:360px;">
+          <label class="wg-label">Range slider</label>
+          <input type="range" class="wg-range" value="65"/>
+        </div>
+        <div class="wg-form-group" style="width:100%;max-width:360px;">
+          <label class="wg-label">Error state</label>
+          <input class="wg-input wg-input-error" type="text" value="bad@"/>
+          <div class="wg-form-error">Enter a valid email address</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════ NAVBAR ════ -->
+    <section class="docs-section" id="navbar">
+      <div class="docs-section-title">Navbar</div>
+      <div class="docs-section-sub">Uses the card color. Brand text uses the art (watermark) color. Nav links are soft-square buttons.</div>
+      <div style="border-radius:3%;overflow:hidden;box-shadow:var(--wg-card-shadow);">
+        <nav class="wg-nav" style="position:static;">
+          <a href="#" class="wg-nav-brand">MySite</a>
+          <div class="wg-nav-links">
+            <a href="#" class="wg-nav-link wg-nav-link-wide">Work</a>
+            <a href="#" class="wg-nav-link wg-nav-link-wide">About</a>
+            <a href="#" class="wg-btn wg-btn-sm">Contact</a>
+          </div>
+        </nav>
+      </div>
+    </section>
+
+    <!-- ════ BADGES & CHIPS ════ -->
+    <section class="docs-section" id="badges">
+      <div class="docs-section-title">Badges & Chips</div>
+      <div class="demo-box">
+        <span class="wg-badge">Default</span>
+        <span class="wg-badge wg-badge-success">Success</span>
+        <span class="wg-badge wg-badge-danger">Danger</span>
+        <span class="wg-badge wg-badge-warning">Warning</span>
+        <span class="wg-badge wg-badge-dot">New</span>
+        <span class="wg-badge wg-badge-surface">Surface</span>
+      </div>
+      <div class="demo-box">
+        <span class="wg-chip">React</span>
+        <span class="wg-chip wg-chip-surface">TypeScript</span>
+        <span class="wg-chip wg-chip-surface2">Figma</span>
+        <span class="wg-chip wg-chip-inset">Design Systems</span>
+      </div>
+    </section>
+
+    <!-- ════ ALERTS ════ -->
+    <section class="docs-section" id="alerts">
+      <div class="docs-section-title">Alerts</div>
+      <div class="demo-box demo-box-col">
+        <div class="wg-alert wg-alert-success" style="width:100%;">
+          <span class="wg-alert-icon">✓</span>
+          <div class="wg-alert-body">
+            <div class="wg-alert-title">Saved successfully</div>
+            <div class="wg-alert-text">Your changes have been saved and are now live.</div>
+          </div>
+          <button class="wg-alert-close">×</button>
+        </div>
+        <div class="wg-alert wg-alert-danger" style="width:100%;">
+          <span class="wg-alert-icon">✕</span>
+          <div class="wg-alert-body">
+            <div class="wg-alert-title">Something went wrong</div>
+            <div class="wg-alert-text">Unable to connect. Check your network and try again.</div>
+          </div>
+        </div>
+        <div class="wg-alert wg-alert-warning" style="width:100%;">
+          <span class="wg-alert-icon">⚠</span>
+          <div class="wg-alert-body">
+            <div class="wg-alert-title">Trial ending soon</div>
+            <div class="wg-alert-text">Your trial expires in 3 days. Upgrade to keep access.</div>
+          </div>
+        </div>
+        <div class="wg-alert wg-alert-info" style="width:100%;">
+          <span class="wg-alert-icon">ℹ</span>
+          <div class="wg-alert-body">
+            <div class="wg-alert-title">New version available</div>
+            <div class="wg-alert-text">widget.css v1.1 is out. See what's changed.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════ AVATAR ════ -->
+    <section class="docs-section" id="avatar">
+      <div class="docs-section-title">Avatar</div>
+      <div class="demo-box">
+        <div class="wg-avatar wg-avatar-sm">AR</div>
+        <div class="wg-avatar">AR</div>
+        <div class="wg-avatar wg-avatar-lg">AR</div>
+        <div class="wg-avatar wg-avatar-circle">JR</div>
+        <div class="wg-avatar-group">
+          <div class="wg-avatar">AR</div>
+          <div class="wg-avatar wg-btn-surface" style="background:var(--wg-surface);">JR</div>
+          <div class="wg-avatar" style="background:var(--wg-surface2);">MK</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════ TABS ════ -->
+    <section class="docs-section" id="tabs">
+      <div class="docs-section-title">Tabs</div>
+      <div class="demo-box demo-box-col">
+        <div class="wg-tabs" data-wg-tabs style="width:100%;">
+          <div class="wg-tab-list">
+            <button class="wg-tab-btn">Overview</button>
+            <button class="wg-tab-btn">Details</button>
+            <button class="wg-tab-btn">Settings</button>
+          </div>
+          <div class="wg-tab-panels">
+            <div class="wg-tab-panel">
+              <div class="wg-card"><div class="wg-card-body"><div class="wg-card-title">Overview</div><p class="wg-card-text">The tab track uses an inset shadow — same as the display screen in the calculator. Active tab uses the button style.</p></div></div>
+            </div>
+            <div class="wg-tab-panel">
+              <div class="wg-card"><div class="wg-card-body"><div class="wg-card-title">Details</div><p class="wg-card-text">Second panel content. Tabs switch without any page reload.</p></div></div>
+            </div>
+            <div class="wg-tab-panel">
+              <div class="wg-card"><div class="wg-card-body"><div class="wg-card-title">Settings</div><p class="wg-card-text">Third panel. Add data-wg-tabs to the container to initialise.</p></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn" data-wg-copy="#code-tabs">Copy</button>
+        <pre id="code-tabs"><span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-tabs"</span> <span class="at">data-wg-tabs</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-tab-list"</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"wg-tab-btn"</span><span class="kw">&gt;</span>Tab 1<span class="kw">&lt;/button&gt;</span>
+    <span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"wg-tab-btn"</span><span class="kw">&gt;</span>Tab 2<span class="kw">&lt;/button&gt;</span>
+  <span class="kw">&lt;/div&gt;</span>
+  <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-tab-panels"</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-tab-panel"</span><span class="kw">&gt;</span>Panel 1<span class="kw">&lt;/div&gt;</span>
+    <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-tab-panel"</span><span class="kw">&gt;</span>Panel 2<span class="kw">&lt;/div&gt;</span>
+  <span class="kw">&lt;/div&gt;</span>
+<span class="kw">&lt;/div&gt;</span></pre>
+      </div>
+    </section>
+
+    <!-- ════ DROPDOWN ════ -->
+    <section class="docs-section" id="dropdown">
+      <div class="docs-section-title">Dropdown</div>
+      <div class="demo-box">
+        <div class="wg-dropdown" data-wg-dropdown>
+          <button class="wg-btn" data-wg-dropdown-toggle>Options ▾</button>
+          <div class="wg-dropdown-menu">
+            <a class="wg-dropdown-item" href="#">Edit profile</a>
+            <a class="wg-dropdown-item" href="#">Settings</a>
+            <div class="wg-dropdown-divider"></div>
+            <a class="wg-dropdown-item danger" href="#">Delete account</a>
+          </div>
+        </div>
+        <div class="wg-dropdown" data-wg-dropdown>
+          <button class="wg-btn wg-btn-circle" data-wg-dropdown-toggle>⋯</button>
+          <div class="wg-dropdown-menu right">
+            <a class="wg-dropdown-item" href="#">Duplicate</a>
+            <a class="wg-dropdown-item" href="#">Archive</a>
+            <div class="wg-dropdown-divider"></div>
+            <a class="wg-dropdown-item danger" href="#">Remove</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════ MODAL ════ -->
+    <section class="docs-section" id="modal">
+      <div class="docs-section-title">Modal</div>
+      <div class="demo-box">
+        <button class="wg-btn" data-wg-modal-open="#demo-modal">Open Modal</button>
+        <button class="wg-btn wg-btn-danger" data-wg-modal-open="#demo-modal">Danger Modal</button>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn" data-wg-copy="#code-modal">Copy</button>
+        <pre id="code-modal"><span class="cm">&lt;!-- Trigger --&gt;</span>
+<span class="kw">&lt;button</span> <span class="at">data-wg-modal-open</span>=<span class="st">"#my-modal"</span><span class="kw">&gt;</span>Open<span class="kw">&lt;/button&gt;</span>
+
+<span class="cm">&lt;!-- Modal --&gt;</span>
+<span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-modal-overlay"</span> <span class="at">id</span>=<span class="st">"my-modal"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-modal"</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-modal-header"</span><span class="kw">&gt;</span>
+      Title <span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"wg-modal-close"</span><span class="kw">&gt;</span>×<span class="kw">&lt;/button&gt;</span>
+    <span class="kw">&lt;/div&gt;</span>
+    <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-modal-body"</span><span class="kw">&gt;</span>Content<span class="kw">&lt;/div&gt;</span>
+    <span class="kw">&lt;div</span> <span class="at">class</span>=<span class="st">"wg-modal-footer"</span><span class="kw">&gt;</span>
+      <span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"wg-btn"</span> <span class="at">data-wg-modal-close</span><span class="kw">&gt;</span>Cancel<span class="kw">&lt;/button&gt;</span>
+      <span class="kw">&lt;button</span> <span class="at">class</span>=<span class="st">"wg-btn wg-btn-success"</span><span class="kw">&gt;</span>Confirm<span class="kw">&lt;/button&gt;</span>
+    <span class="kw">&lt;/div&gt;</span>
+  <span class="kw">&lt;/div&gt;</span>
+<span class="kw">&lt;/div&gt;</span></pre>
+      </div>
+    </section>
+
+    <!-- ════ TOAST ════ -->
+    <section class="docs-section" id="toast">
+      <div class="docs-section-title">Toast</div>
+      <div class="demo-box">
+        <button class="wg-btn" onclick="wgToast('Changes saved!', {type:'success'})">Success</button>
+        <button class="wg-btn wg-btn-danger" onclick="wgToast('Something went wrong.', {type:'danger'})">Danger</button>
+        <button class="wg-btn wg-btn-warning" onclick="wgToast('Your session expires soon.', {type:'warning'})">Warning</button>
+        <button class="wg-btn wg-btn-surface" onclick="wgToast('New update available.')">Info</button>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn" data-wg-copy="#code-toast">Copy</button>
+        <pre id="code-toast">wgToast(<span class="st">'Changes saved!'</span>, { type: <span class="st">'success'</span>, duration: <span class="st">3000</span> });
+wgToast(<span class="st">'Something went wrong.'</span>, { type: <span class="st">'danger'</span> });
+wgToast(<span class="st">'Session expiring.'</span>, { type: <span class="st">'warning'</span> });
+wgToast(<span class="st">'Update available.'</span>); <span class="cm">// no type = info</span></pre>
+      </div>
+    </section>
+
+    <!-- ════ PROGRESS ════ -->
+    <section class="docs-section" id="progress">
+      <div class="docs-section-title">Progress</div>
+      <div class="demo-box demo-box-col" style="gap:16px;">
+        <div style="width:100%;">
+          <div class="wg-progress"><div class="wg-progress-bar" style="width:72%"></div></div>
+        </div>
+        <div style="width:100%;">
+          <div class="wg-progress"><div class="wg-progress-bar success" style="width:45%"></div></div>
+        </div>
+        <div style="width:100%;">
+          <div class="wg-progress"><div class="wg-progress-bar danger" style="width:90%"></div></div>
+        </div>
+        <div class="wg-progress-labeled" style="width:100%;">
+          <div class="wg-progress"><div class="wg-progress-bar" id="demo-progress" style="width:65%"></div></div>
+          <div class="wg-progress-val">65%</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="wg-btn wg-btn-sm" onclick="wgProgress('#demo-progress', Math.max(0, parseInt(document.getElementById('demo-progress').style.width)-10))">−10%</button>
+          <button class="wg-btn wg-btn-sm" onclick="wgProgress('#demo-progress', Math.min(100, parseInt(document.getElementById('demo-progress').style.width)+10))">+10%</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════ TABLE ════ -->
+    <section class="docs-section" id="table">
+      <div class="docs-section-title">Table</div>
+      <div class="wg-table-wrap wg-mb-5">
+        <table class="wg-table">
+          <thead>
+            <tr><th>Name</th><th>Role</th><th>Status</th><th>Joined</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Alex Rivera</td><td>Designer</td><td><span class="wg-badge wg-badge-success">Active</span></td><td>Jan 2022</td></tr>
+            <tr><td>Jordan Kim</td><td>Developer</td><td><span class="wg-badge wg-badge-success">Active</span></td><td>Mar 2022</td></tr>
+            <tr><td>Sam Patel</td><td>PM</td><td><span class="wg-badge">Away</span></td><td>Jun 2021</td></tr>
+            <tr><td>Riley Osei</td><td>Designer</td><td><span class="wg-badge wg-badge-danger">Inactive</span></td><td>Sep 2023</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ════ LIST GROUP ════ -->
+    <section class="docs-section" id="list">
+      <div class="docs-section-title">List Group</div>
+      <div class="demo-box demo-box-col" style="gap:16px;">
+        <div class="wg-list" style="width:100%;max-width:340px;">
+          <div class="wg-list-item active">
+            <span>🏠</span> Dashboard
+            <span class="wg-list-item-end"><span class="wg-badge">3</span></span>
+          </div>
+          <div class="wg-list-item"><span>📁</span> Projects</div>
+          <div class="wg-list-item"><span>⚙️</span> Settings</div>
+          <div class="wg-list-item"><span>👤</span> Profile</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════ SPINNER ════ -->
+    <section class="docs-section" id="spinner">
+      <div class="docs-section-title">Spinner</div>
+      <div class="demo-box">
+        <div class="wg-spinner wg-spinner-sm"></div>
+        <div class="wg-spinner"></div>
+        <div class="wg-spinner wg-spinner-lg"></div>
+        <button class="wg-btn" id="loadBtn" onclick="
+          this.disabled=true;
+          this.innerHTML='<span class=\'wg-spinner wg-spinner-sm\'></span> Loading…';
+          setTimeout(()=>{this.disabled=false;this.textContent='Load Data'},2000)
+        ">Load Data</button>
+      </div>
+    </section>
+
+    <!-- ════ EMPTY STATE ════ -->
+    <section class="docs-section" id="empty">
+      <div class="docs-section-title">Empty State</div>
+      <div class="demo-box">
+        <div class="wg-empty" style="width:100%;">
+          <div class="wg-empty-icon">📭</div>
+          <div class="wg-empty-title">Nothing here yet</div>
+          <div class="wg-empty-text">Add your first item to get started.</div>
+          <button class="wg-btn wg-mt-4">Add item</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════ DIVIDER ════ -->
+    <section class="docs-section" id="divider">
+      <div class="docs-section-title">Divider</div>
+      <div class="demo-box demo-box-col">
+        <span>Content above</span>
+        <hr class="wg-divider"/>
+        <span>Content below</span>
+        <div class="wg-divider-label">or continue with</div>
+        <button class="wg-btn">GitHub</button>
+      </div>
+    </section>
+
+    <!-- ════ BREADCRUMB ════ -->
+    <section class="docs-section" id="breadcrumb">
+      <div class="docs-section-title">Breadcrumb</div>
+      <div class="demo-box">
+        <nav class="wg-breadcrumb">
+          <a class="wg-breadcrumb-item" href="#">Home</a>
+          <span class="wg-breadcrumb-sep">/</span>
+          <a class="wg-breadcrumb-item" href="#">Projects</a>
+          <span class="wg-breadcrumb-sep">/</span>
+          <span class="wg-breadcrumb-item active">Orbit Dashboard</span>
+        </nav>
+      </div>
+    </section>
+
+    <!-- ════ TOOLTIP DEMO ════ -->
+    <section class="docs-section" id="spacing">
+      <div class="docs-section-title">Tooltips & Spacing</div>
+      <div class="demo-box">
+        <button class="wg-btn" data-wg-tip="This is a tooltip">Hover me</button>
+        <button class="wg-btn wg-btn-circle" data-wg-tip="Circle button">+</button>
+        <span data-wg-tip="Any element can have a tooltip" style="cursor:help;color:var(--wg-text-secondary);">Hover text (?)</span>
+      </div>
+    </section>
+
+    <!-- ════ UTILITIES ════ -->
+    <section class="docs-section" id="utilities">
+      <div class="docs-section-title">Display & Flex Utilities</div>
+      <div class="code-block">
+        <pre><span class="cm">/* Spacing: mt, mb, ml, mr, p, px, py — scale 1–8 */</span>
+<span class="at">.wg-mt-4</span>  { margin-top: <span class="st">16px</span> }
+<span class="at">.wg-mb-5</span>  { margin-bottom: <span class="st">24px</span> }
+<span class="at">.wg-p-5</span>   { padding: <span class="st">24px</span> }
+<span class="at">.wg-gap-3</span> { gap: <span class="st">12px</span> }
+
+<span class="cm">/* Display */</span>
+<span class="at">.wg-d-flex</span>  .wg-d-grid  .wg-d-none  .wg-d-block
+
+<span class="cm">/* Flex */</span>
+<span class="at">.wg-flex-col</span>  .wg-flex-wrap
+<span class="at">.wg-align-center</span>  .wg-justify-between  .wg-justify-end
+
+<span class="cm">/* Text */</span>
+<span class="at">.wg-text-center</span>  .wg-text-muted  .wg-text-bold  .wg-text-upper
+
+<span class="cm">/* Responsive visibility */</span>
+<span class="at">.wg-hidden-sm</span>   <span class="cm">/* hide below 768px */</span>
+<span class="at">.wg-hidden-md</span>   <span class="cm">/* hide below 1024px */</span>
+<span class="at">.wg-visible-sm</span>  <span class="cm">/* hide above 768px */</span></pre>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ── Demo Modal ── -->
+<div class="wg-modal-overlay" id="demo-modal">
+  <div class="wg-modal">
+    <div class="wg-modal-header">
+      Confirm action
+      <button class="wg-modal-close">×</button>
+    </div>
+    <div class="wg-modal-body">
+      This modal uses the card color and the same colored drop shadow as all other containers. Clicking the overlay or pressing Escape closes it.
+    </div>
+    <div class="wg-modal-footer">
+      <button class="wg-btn wg-btn-ghost" data-wg-modal-close>Cancel</button>
+      <button class="wg-btn wg-btn-success" data-wg-modal-close onclick="wgToast('Action confirmed!', {type:'success'})">Confirm</button>
+    </div>
+  </div>
+</div>
+<script>
+/**
+ * widget-theme.js
+ * Computes the full design token set from a single hero hue (0–360).
+ * Usage:
+ *   WidgetTheme.set(200);          // set by hue integer
+ *   WidgetTheme.set('#1093af');    // set by hex color
+ *   WidgetTheme.set('hsl(200,60%,37%)'); // set by hsl string
+ *   WidgetTheme.override('--wg-btn', '#ff0000'); // override one token
+ *   WidgetTheme.get();             // returns current hue
+ */
+
+const WidgetTheme = (() => {
+
+  // ── Colour math helpers ──────────────────────────────────────
+
+  /** Convert hex → [h, s, l] (0-360, 0-100, 0-100) */
+  function hexToHsl(hex) {
+    hex = hex.replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    const r = parseInt(hex.slice(0,2),16)/255;
+    const g = parseInt(hex.slice(2,4),16)/255;
+    const b = parseInt(hex.slice(4,6),16)/255;
+    return rgbToHsl(r, g, b);
+  }
+
+  /** Parse 'hsl(H,S%,L%)' or 'hsl(H S% L%)' → [h, s, l] */
+  function hslStringToHsl(str) {
+    const m = str.match(/hsl\(\s*([0-9.]+)[,\s]+([0-9.]+)%[,\s]+([0-9.]+)%/i);
+    if (m) return [parseFloat(m[1]), parseFloat(m[2]), parseFloat(m[3])];
+    return null;
+  }
+
+  function rgbToHsl(r, g, b) {
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    let h, s, l = (max+min)/2;
+    if (max === min) { h = s = 0; }
+    else {
+      const d = max - min;
+      s = l > 0.5 ? d/(2-max-min) : d/(max+min);
+      switch(max) {
+        case r: h = ((g-b)/d + (g<b?6:0))/6; break;
+        case g: h = ((b-r)/d + 2)/6; break;
+        case b: h = ((r-g)/d + 4)/6; break;
+      }
+    }
+    return [Math.round(h*360), Math.round(s*100), Math.round(l*100)];
+  }
+
+  function hslToHex(h, s, l) {
+    s /= 100; l /= 100;
+    const k = n => (n + h/30) % 12;
+    const a = s * Math.min(l, 1-l);
+    const f = n => l - a*Math.max(-1, Math.min(k(n)-3, Math.min(9-k(n), 1)));
+    const toHex = x => Math.round(x*255).toString(16).padStart(2,'0');
+    return `#${toHex(f(0))}${toHex(f(8))}${toHex(f(4))}`;
+  }
+
+  function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
+
+  /**
+   * Given a hero hue + saturation + lightness,
+   * compute the full token set matching the design language.
+   *
+   * The pattern extracted from the three apps:
+   *  page-bg  → very light, desaturated, ~92% lightness, s reduced by ~55%
+   *  card     → the hero color itself
+   *  btn      → slightly lighter L+6, 87% opacity
+   *  surface  → L+12, more saturated feel
+   *  surface2 → L+20, lighter variant for tags/operators
+   *  shadow   → darker D-15, s-10, 0.85–0.92 opacity (colored shadow!)
+   *  art      → very dark D-30+, s-20, 0.65–0.81 opacity (watermark text)
+   *  inset    → L+8 (display screen / input bg)
+   */
+  function computeTokens(h, s, l) {
+    // Clamp saturation and lightness to useful ranges
+    s = clamp(s, 20, 90);
+    l = clamp(l, 20, 65);
+
+    const pageBgS = clamp(s * 0.35, 5, 35);
+    const pageBgL = clamp(92 + (50 - l) * 0.1, 87, 96);
+
+    const shadowL  = clamp(l - 16, 8, 40);
+    const shadowS  = clamp(s - 8, 15, 85);
+
+    const artL     = clamp(l - 28, 8, 35);
+    const artS     = clamp(s - 15, 10, 75);
+
+    const btnL     = clamp(l + 6,  20, 72);
+    const surfaceL = clamp(l + 14, 25, 78);
+    const surface2L= clamp(l + 22, 30, 84);
+    const insetL   = clamp(l + 10, 22, 75);
+
+    // Semantic colors — fixed but slightly tinted toward hero hue
+    // (a small hue shift toward hero makes them feel part of the family)
+    const dangerH  = 355;
+    const successH = 158;
+    const warningH = 38;
+    const infoH    = 205;
+
+    return {
+      // ── Page ──
+      '--wg-page-bg':     `hsla(${h},${pageBgS}%,${pageBgL}%,0.97)`,
+
+      // ── Card / Container ──
+      '--wg-card':        `hsl(${h},${s}%,${l}%)`,
+      '--wg-card-shadow': `3px 6px 8px -1px hsla(${h},${shadowS}%,${shadowL}%,0.88)`,
+
+      // ── Buttons ──
+      '--wg-btn':         `hsla(${h},${clamp(s+4,20,90)}%,${btnL}%,0.90)`,
+      '--wg-btn-shadow':  `3px 3px 19px 0px rgba(0,0,0,0.27)`,
+      '--wg-btn-hover':   `1px 1px 5px 0px rgba(0,0,0,0.27)`,
+      '--wg-btn-active':  `inset 0px 0px 33px 16px rgba(0,0,0,0.27)`,
+
+      // ── Surfaces ──
+      '--wg-surface':     `hsl(${h},${clamp(s+2,20,90)}%,${surfaceL}%)`,
+      '--wg-surface2':    `hsl(${h},${clamp(s-5,15,85)}%,${surface2L}%)`,
+      '--wg-inset':       `hsl(${h},${clamp(s+6,20,90)}%,${insetL}%)`,
+      '--wg-inset-shadow':'inset 2px 3px 9px 1px rgba(0,0,0,0.22)',
+
+      // ── Text ──
+      '--wg-text-primary':  `hsla(0,0%,100%,0.96)`,
+      '--wg-text-secondary':'hsla(0,0%,100%,0.60)',
+      '--wg-text-muted':    `hsla(0,0%,100%,0.38)`,
+      '--wg-art':           `hsla(${h},${artS}%,${artL}%,0.72)`,  // watermark
+
+      // ── Shadow ──
+      '--wg-shadow-color':  `hsla(${h},${shadowS}%,${shadowL}%,0.88)`,
+
+      // ── Semantic (danger, success, warning, info) ──
+      '--wg-danger':   `hsl(${dangerH},65%,50%)`,
+      '--wg-success':  `hsl(${successH},58%,40%)`,
+      '--wg-warning':  `hsl(${warningH},90%,48%)`,
+      '--wg-info':     `hsl(${infoH},60%,45%)`,
+
+      '--wg-danger-bg':  `hsla(${dangerH},65%,50%,0.15)`,
+      '--wg-success-bg': `hsla(${successH},58%,40%,0.15)`,
+      '--wg-warning-bg': `hsla(${warningH},90%,48%,0.15)`,
+      '--wg-info-bg':    `hsla(${infoH},60%,45%,0.15)`,
+
+      // ── Border radii (fixed from design language) ──
+      '--wg-radius-card':  '2%',
+      '--wg-radius-btn':   '15%',
+      '--wg-radius-wide':  '3%',
+      '--wg-radius-circle':'50%',
+      '--wg-radius-chip':  '15%',
+
+      // ── Spacing scale ──
+      '--wg-space-1': '4px',
+      '--wg-space-2': '8px',
+      '--wg-space-3': '12px',
+      '--wg-space-4': '16px',
+      '--wg-space-5': '24px',
+      '--wg-space-6': '32px',
+      '--wg-space-7': '48px',
+      '--wg-space-8': '64px',
+
+      // ── Typography scale ──
+      '--wg-text-xs':  '11px',
+      '--wg-text-sm':  '13px',
+      '--wg-text-base':'15px',
+      '--wg-text-lg':  '18px',
+      '--wg-text-xl':  '22px',
+      '--wg-text-2xl': '28px',
+      '--wg-text-3xl': '36px',
+
+      // ── Store raw hue for JS consumers ──
+      '--wg-h': h,
+      '--wg-s': s,
+      '--wg-l': l,
+    };
+  }
+
+  // ── Apply tokens to a root element ──────────────────────────
+  let _currentH = 200, _currentS = 60, _currentL = 37;
+  let _overrides = {};
+
+  function applyTokens(tokens, root = document.documentElement) {
+    for (const [k, v] of Object.entries(tokens)) {
+      root.style.setProperty(k, v);
+    }
+    // Re-apply any user overrides on top
+    for (const [k, v] of Object.entries(_overrides)) {
+      root.style.setProperty(k, v);
+    }
+    // Also set body background
+    document.body && (document.body.style.backgroundColor = tokens['--wg-page-bg']);
+  }
+
+  // ── Public API ───────────────────────────────────────────────
+  function set(input, saturation, lightness) {
+    let h, s, l;
+
+    if (typeof input === 'number') {
+      // Direct HSL
+      h = Math.round(input) % 360;
+      s = saturation !== undefined ? saturation : _currentS;
+      l = lightness  !== undefined ? lightness  : _currentL;
+    } else if (typeof input === 'string') {
+      if (input.startsWith('#')) {
+        [h, s, l] = hexToHsl(input);
+      } else if (input.toLowerCase().startsWith('hsl')) {
+        const parsed = hslStringToHsl(input);
+        if (parsed) [h, s, l] = parsed;
+        else { console.warn('WidgetTheme: could not parse', input); return; }
+      } else {
+        console.warn('WidgetTheme: unknown format', input); return;
+      }
+    } else {
+      console.warn('WidgetTheme.set() expects a hue number, hex string, or hsl string'); return;
+    }
+
+    _currentH = h; _currentS = s; _currentL = l;
+    const tokens = computeTokens(h, s, l);
+    applyTokens(tokens);
+
+    // Fire custom event so docs page can react
+    document.dispatchEvent(new CustomEvent('wg:theme', { detail: { h, s, l, tokens } }));
+    return tokens;
+  }
+
+  function get() { return { h: _currentH, s: _currentS, l: _currentL }; }
+
+  function override(varName, value) {
+    _overrides[varName] = value;
+    document.documentElement.style.setProperty(varName, value);
+  }
+
+  function resetOverrides() {
+    _overrides = {};
+    set(_currentH, _currentS, _currentL);
+  }
+
+  function toHex() { return hslToHex(_currentH, _currentS, _currentL); }
+
+  // Presets matching the original apps
+  const presets = {
+    pomodoro: () => set('#c4283e'),
+    calculator: () => set('#1093af'),
+    todo: () => set('hsl(100,100%,30%)'),
+    indigo: () => set(240, 55, 42),
+    amber:  () => set(38,  90, 45),
+    rose:   () => set(340, 70, 45),
+  };
+
+  return { set, get, override, resetOverrides, toHex, presets, computeTokens, hexToHsl };
+})();
+
+// Auto-init: read --wg-hero-hue from CSS if set, else default to indigo
+document.addEventListener('DOMContentLoaded', () => {
+  const rootStyle = getComputedStyle(document.documentElement);
+  const heroHue = rootStyle.getPropertyValue('--wg-hero-hue').trim();
+  const heroHex = rootStyle.getPropertyValue('--wg-hero-hex').trim();
+  const heroHsl = rootStyle.getPropertyValue('--wg-hero-hsl').trim();
+
+  if (heroHex)       WidgetTheme.set(heroHex);
+  else if (heroHsl)  WidgetTheme.set(heroHsl);
+  else if (heroHue)  WidgetTheme.set(parseInt(heroHue));
+  else               WidgetTheme.set(240, 55, 42); // default: indigo
+});
+
+</script>
+<script>
+/**
+ * widget-interact.js
+ * Handles all interactive component behaviors.
+ * No dependencies — pure vanilla JS.
+ */
+
+(function () {
+  'use strict';
+
+  // ── Utility ──────────────────────────────────────────────────
+  const on = (el, ev, fn) => el && el.addEventListener(ev, fn);
+  const qs = (sel, root = document) => root.querySelector(sel);
+  const qsa = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+  // ── Tabs ─────────────────────────────────────────────────────
+  function initTabs() {
+    qsa('[data-wg-tabs]').forEach(container => {
+      const btnList = qsa('.wg-tab-btn', container);
+      const panels  = qsa('.wg-tab-panel', container);
+
+      function activate(index) {
+        btnList.forEach((b, i) => b.classList.toggle('active', i === index));
+        panels.forEach((p, i)  => p.classList.toggle('active',  i === index));
+      }
+
+      btnList.forEach((btn, i) => {
+        on(btn, 'click', () => activate(i));
+      });
+
+      // Activate first by default
+      if (!btnList.some(b => b.classList.contains('active'))) activate(0);
+    });
+  }
+
+  // ── Dropdowns ────────────────────────────────────────────────
+  function initDropdowns() {
+    qsa('[data-wg-dropdown]').forEach(container => {
+      const trigger = qs('[data-wg-dropdown-toggle]', container) || qs('.wg-btn', container);
+      const menu    = qs('.wg-dropdown-menu', container);
+      if (!trigger || !menu) return;
+
+      on(trigger, 'click', (e) => {
+        e.stopPropagation();
+        const isOpen = menu.classList.contains('open');
+        closeAllDropdowns();
+        if (!isOpen) menu.classList.add('open');
+      });
+    });
+
+    // Close on outside click
+    on(document, 'click', closeAllDropdowns);
+    on(document, 'keydown', e => { if (e.key === 'Escape') closeAllDropdowns(); });
+  }
+
+  function closeAllDropdowns() {
+    qsa('.wg-dropdown-menu.open').forEach(m => m.classList.remove('open'));
+  }
+
+  // ── Modals ───────────────────────────────────────────────────
+  function initModals() {
+    // Open triggers: data-wg-modal-open="#modal-id"
+    on(document, 'click', (e) => {
+      const trigger = e.target.closest('[data-wg-modal-open]');
+      if (trigger) {
+        const target = qs(trigger.dataset.wgModalOpen);
+        if (target) openModal(target);
+      }
+
+      // Close triggers: data-wg-modal-close, .wg-modal-close, or overlay click
+      if (
+        e.target.closest('[data-wg-modal-close]') ||
+        e.target.closest('.wg-modal-close') ||
+        e.target.classList.contains('wg-modal-overlay')
+      ) {
+        const overlay = e.target.closest('.wg-modal-overlay');
+        if (overlay) closeModal(overlay);
+      }
+    });
+
+    // Keyboard: Escape to close
+    on(document, 'keydown', e => {
+      if (e.key === 'Escape') {
+        qsa('.wg-modal-overlay.open').forEach(closeModal);
+      }
+    });
+  }
+
+  function openModal(overlayOrModal) {
+    const overlay = overlayOrModal.classList.contains('wg-modal-overlay')
+      ? overlayOrModal
+      : overlayOrModal.closest('.wg-modal-overlay');
+    if (overlay) {
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeModal(overlay) {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Expose for manual use
+  window.wgModal = { open: openModal, close: closeModal };
+
+  // ── Alerts (dismissible) ─────────────────────────────────────
+  function initAlerts() {
+    on(document, 'click', e => {
+      const btn = e.target.closest('.wg-alert-close');
+      if (btn) {
+        const alert = btn.closest('.wg-alert');
+        if (alert) {
+          alert.style.transition = 'opacity 0.2s';
+          alert.style.opacity = '0';
+          setTimeout(() => alert.classList.add('wg-alert-dismissed'), 200);
+        }
+      }
+    });
+  }
+
+  // ── Toasts ───────────────────────────────────────────────────
+  function getToastContainer() {
+    let el = qs('.wg-toast-container');
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'wg-toast-container';
+      document.body.appendChild(el);
+    }
+    return el;
+  }
+
+  function showToast(message, { type = '', duration = 3000, icon = '' } = {}) {
+    const container = getToastContainer();
+
+    const icons = {
+      success: '✓',
+      danger:  '✕',
+      warning: '⚠',
+      '': 'ℹ',
+    };
+
+    const toast = document.createElement('div');
+    toast.className = `wg-toast${type ? ' wg-toast-' + type : ''}`;
+    toast.innerHTML = `
+      <span class="wg-toast-icon">${icon || icons[type] || icons['']}</span>
+      <span class="wg-toast-msg">${message}</span>
+    `;
+    container.appendChild(toast);
+
+    const dismiss = () => {
+      toast.classList.add('wg-toast-out');
+      setTimeout(() => toast.remove(), 220);
+    };
+
+    setTimeout(dismiss, duration);
+    on(toast, 'click', dismiss);
+
+    return { dismiss };
+  }
+
+  // Expose globally
+  window.wgToast = showToast;
+
+  // ── Custom Checkboxes ────────────────────────────────────────
+  function initCheckboxes() {
+    on(document, 'click', e => {
+      const box = e.target.closest('.wg-check-box');
+      if (box) {
+        box.classList.toggle('checked');
+        const label = box.closest('.wg-check-label');
+        if (label) {
+          const input = label.querySelector('input[type="checkbox"]');
+          if (input) input.checked = box.classList.contains('checked');
+        }
+        box.dispatchEvent(new CustomEvent('wg:check', {
+          bubbles: true,
+          detail: { checked: box.classList.contains('checked') }
+        }));
+      }
+    });
+  }
+
+  // ── Toggle switches ──────────────────────────────────────────
+  function initToggles() {
+    // Native input drives the toggle; CSS handles the visual
+    // But for custom .wg-toggle-track clicks:
+    on(document, 'click', e => {
+      const track = e.target.closest('.wg-toggle-track');
+      if (track) {
+        const wrapper = track.closest('.wg-toggle');
+        const input   = wrapper && qs('input', wrapper);
+        if (input) {
+          input.checked = !input.checked;
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+    });
+  }
+
+  // ── Code copy buttons ─────────────────────────────────────────
+  function initCopyButtons() {
+    on(document, 'click', async e => {
+      const btn = e.target.closest('[data-wg-copy]');
+      if (!btn) return;
+
+      const targetSel = btn.dataset.wgCopy;
+      const text = targetSel
+        ? (qs(targetSel)?.textContent || '')
+        : (btn.dataset.wgCopyText || '');
+
+      if (!text) return;
+
+      try {
+        await navigator.clipboard.writeText(text.trim());
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = orig; }, 1500);
+      } catch {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = text.trim();
+        ta.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = orig; }, 1500);
+      }
+    });
+  }
+
+  // ── Progress bar helper ──────────────────────────────────────
+  function setProgress(barEl, value) {
+    const clamped = Math.min(100, Math.max(0, value));
+    if (typeof barEl === 'string') barEl = qs(barEl);
+    if (barEl) {
+      barEl.style.width = clamped + '%';
+      const label = barEl.closest('.wg-progress-labeled')?.querySelector('.wg-progress-val');
+      if (label) label.textContent = Math.round(clamped) + '%';
+    }
+  }
+  window.wgProgress = setProgress;
+
+  // ── Init all ─────────────────────────────────────────────────
+  function init() {
+    initTabs();
+    initDropdowns();
+    initModals();
+    initAlerts();
+    initCheckboxes();
+    initToggles();
+    initCopyButtons();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})();
+
+</script>
+<script>
+// ── Live theme controls ──────────────────────────────────────
+const hueSlider  = document.getElementById('hueSlider');
+const satSlider  = document.getElementById('satSlider');
+const litSlider  = document.getElementById('litSlider');
+const hueThumb   = document.getElementById('hueThumb');
+const hueDisplay = document.getElementById('hueDisplay');
+const satVal     = document.getElementById('satVal');
+const litVal     = document.getElementById('litVal');
+
+function syncControls() {
+  const { h, s, l } = WidgetTheme.get();
+  hueSlider.value = h;
+  satSlider.value = s;
+  litSlider.value = l;
+  hueThumb.style.left = (h / 359 * 100) + '%';
+  hueThumb.style.background = `hsl(${h},${s}%,${l}%)`;
+  hueDisplay.textContent = `hsl(${h}, ${s}%, ${l}%)`;
+  satVal.textContent = s;
+  litVal.textContent = l;
+  updateTokenGrid();
+}
+
+function applyTheme() {
+  WidgetTheme.set(
+    parseInt(hueSlider.value),
+    parseInt(satSlider.value),
+    parseInt(litSlider.value)
+  );
+  syncControls();
+}
+
+hueSlider.addEventListener('input', applyTheme);
+satSlider.addEventListener('input', applyTheme);
+litSlider.addEventListener('input', applyTheme);
+
+// ── Token grid ───────────────────────────────────────────────
+const TOKEN_DISPLAY = [
+  '--wg-page-bg', '--wg-card', '--wg-btn',
+  '--wg-surface', '--wg-surface2', '--wg-inset',
+  '--wg-art', '--wg-danger', '--wg-success',
+  '--wg-warning', '--wg-info',
+];
+
+function updateTokenGrid() {
+  const grid = document.getElementById('tokenGrid');
+  const root = getComputedStyle(document.documentElement);
+  grid.innerHTML = TOKEN_DISPLAY.map(name => {
+    const val = root.getPropertyValue(name).trim();
+    return `
+      <div class="token-swatch">
+        <div class="token-color" style="background:${val}"></div>
+        <div class="token-info">
+          <div class="token-name">${name}</div>
+          <div class="token-val">${val}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Sidebar active link on scroll ────────────────────────────
+const sections = document.querySelectorAll('.docs-section');
+const navLinks = document.querySelectorAll('.docs-nav-link[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector(`.docs-nav-link[href="#${entry.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// ── Init ─────────────────────────────────────────────────────
+document.addEventListener('wg:theme', syncControls);
+// Give theme engine time to init
+setTimeout(syncControls, 80);
+</script>
+</body>
+</html>
