@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: #bae5e5;
+      font-family: 'Roboto', Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    #calcBox {
+      margin-top: 20px;
+      background-color: #1093af;
+      width: 280px;
+      border-radius: 2%;
+      padding: 0 8px 12px 8px;
+      box-shadow: 3px 6px 8px -1px rgba(87, 148, 148, 1);
+    }
+
+    @media screen and (min-width: 600px) {
+      #calcBox { margin-top: 20vh; }
+    }
+
+    /* ── Top row: display + C ── */
+    .top-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 2px 6px 2px;
+    }
+
+    #displayScr {
+      flex: 1;
+      height: 38px;
+      line-height: 38px;
+      font-size: 22px;
+      text-align: right;
+      padding-right: 10px;
+      background-color: #2ac29a;
+      border-radius: 3%;
+      overflow: hidden;
+      color: white;
+      box-shadow: inset 2px 3px 9px 1px rgba(0,0,0,0.27);
+      font-weight: 400;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── All buttons ── */
+    .keyCalc {
+      width: 45px;
+      height: 45px;
+      flex-shrink: 0;
+      margin: 5px;
+      font-size: 16px;
+      font-weight: 600;
+      background-color: #1babab;
+      border-radius: 15%;
+      color: white;
+      border: none;
+      cursor: pointer;
+      box-shadow: 3px 3px 19px 0px rgba(0,0,0,0.27);
+      transition: box-shadow 0.08s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+    }
+    .keyCalc:hover  { box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.27); }
+    .keyCalc:active { box-shadow: inset 0px 0px 33px 16px rgba(0,0,0,0.27); }
+
+    .mathCalc { background-color: #41afbd; }
+    .redKey   { background-color: #b35764; }
+    .greenKey { background-color: #20b286; }
+
+    /* ── Number rows ── */
+    .key-row {
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+<div id="calcBox">
+
+  <!-- Row 1: display + C -->
+  <div class="top-row">
+    <div id="displayScr">0</div>
+    <button class="keyCalc redKey" data-val="C">C</button>
+  </div>
+
+  <!-- Row 2: 7 8 9 ÷ -->
+  <div class="key-row">
+    <button class="keyCalc" data-val="7">7</button>
+    <button class="keyCalc" data-val="8">8</button>
+    <button class="keyCalc" data-val="9">9</button>
+    <button class="keyCalc mathCalc" data-val="÷">÷</button>
+  </div>
+
+  <!-- Row 3: 4 5 6 × -->
+  <div class="key-row">
+    <button class="keyCalc" data-val="4">4</button>
+    <button class="keyCalc" data-val="5">5</button>
+    <button class="keyCalc" data-val="6">6</button>
+    <button class="keyCalc mathCalc" data-val="×">×</button>
+  </div>
+
+  <!-- Row 4: 1 2 3 − -->
+  <div class="key-row">
+    <button class="keyCalc" data-val="1">1</button>
+    <button class="keyCalc" data-val="2">2</button>
+    <button class="keyCalc" data-val="3">3</button>
+    <button class="keyCalc mathCalc" data-val="−">−</button>
+  </div>
+
+  <!-- Row 5: 0 . = + -->
+  <div class="key-row">
+    <button class="keyCalc" data-val="0">0</button>
+    <button class="keyCalc" data-val=".">.</button>
+    <button class="keyCalc greenKey" data-val="=">=</button>
+    <button class="keyCalc mathCalc" data-val="+">+</button>
+  </div>
+
+</div>
+
+<script>
+  const display = document.getElementById('displayScr');
+  let firstNum = null, operator = null, currentInput = '', justCalculated = false;
+
+  function updateDisplay(val) {
+    const str = String(val);
+    display.textContent = str.length > 13 ? str.slice(-13) : str;
+  }
+
+  function calculate(a, op, b) {
+    a = parseFloat(a); b = parseFloat(b);
+    switch (op) {
+      case '+': return a + b;
+      case '−': return a - b;
+      case '×': return a * b;
+      case '÷': return b === 0 ? 'Error' : a / b;
+    }
+  }
+
+  function formatResult(n) {
+    if (n === 'Error') return 'Error';
+    return String(parseFloat(n.toPrecision(10)));
+  }
+
+  document.getElementById('calcBox').addEventListener('click', (e) => {
+    const btn = e.target.closest('.keyCalc');
+    if (!btn) return;
+    const val = btn.dataset.val;
+    if (!val) return;
+
+    if (val === 'C') {
+      firstNum = null; operator = null; currentInput = ''; justCalculated = false;
+      updateDisplay('0'); return;
+    }
+
+    if (val === '=') {
+      if (firstNum !== null && operator && currentInput !== '') {
+        const result = calculate(firstNum, operator, currentInput);
+        const formatted = formatResult(result);
+        updateDisplay(formatted);
+        currentInput = formatted; firstNum = null; operator = null; justCalculated = true;
+      }
+      return;
+    }
+
+    const isOperator = ['+', '−', '×', '÷'].includes(val);
+    if (isOperator) {
+      if (currentInput !== '') {
+        if (firstNum !== null && operator) {
+          const formatted = formatResult(calculate(firstNum, operator, currentInput));
+          updateDisplay(formatted); firstNum = formatted;
+        } else { firstNum = currentInput; }
+        currentInput = '';
+      }
+      operator = val; justCalculated = false; return;
+    }
+
+    if (justCalculated) { currentInput = ''; justCalculated = false; }
+    if (val === '.') { if (currentInput.includes('.')) return; if (currentInput === '') currentInput = '0'; }
+    currentInput += val;
+    updateDisplay(currentInput);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    const map = {
+      '0':'0','1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9',
+      '.':'.','Enter':'=','=':'=','+':'+','-':'−','*':'×','/':'÷','Backspace':'C','Escape':'C'
+    };
+    const mapped = map[e.key];
+    if (mapped) {
+      e.preventDefault();
+      const btn = [...document.querySelectorAll('.keyCalc')].find(b => b.dataset.val === mapped);
+      if (btn) btn.click();
+    }
+  });
+</script>
+</body>
+</html>
