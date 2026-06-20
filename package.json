@@ -1,0 +1,25 @@
+{
+  "name": "2015",
+  "version": "1.0.0",
+  "description": "A design system that knows exactly what it is.",
+  "main": "dist/2015.css",
+  "files": [
+    "dist/",
+    "docs/",
+    "examples/",
+    "README.md"
+  ],
+  "keywords": [
+    "design-system",
+    "css",
+    "ui",
+    "components",
+    "theming"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/2015.git"
+  },
+  "homepage": "https://YOUR_USERNAME.github.io/2015/"
+}

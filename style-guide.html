@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Design Language Document — Jayash Raj</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* Extracted palette */
+      --red-bg:        #c4283e;
+      --red-card:      rgba(196, 40, 62, 1);
+      --red-btn:       rgba(201, 54, 76, 0.87);
+      --red-btn-lg:    rgba(203, 35, 59, 0.87);
+      --red-text-art:  rgba(105, 38, 38, 0.81);
+      --red-shadow:    rgba(185, 63, 80, 0.92);
+      --teal-bg:       #bae5e5;
+      --teal-card:     #1093af;
+      --teal-btn:      #1babab;
+      --teal-math:     #41afbd;
+      --teal-display:  #2ac29a;
+      --teal-shadow:   rgba(87,148,148,1);
+      --accent-red:    #b35764;
+      --accent-green:  #20b286;
+      --body-bg:       rgba(230,230,230,0.96);
+      --white:         rgba(245, 236, 236, 0.96);
+      --shadow-btn:    rgba(0,0,0,0.27);
+
+      --lime-bg:       rgba(220,235,210,0.96);
+      --lime-card:     rgb(76,153,0);
+      --lime-btn:      rgba(120,200,20,0.9);
+      --lime-display:  #7ed957;
+      --lime-shadow:   rgba(60,120,10,0.92);
+
+      --doc-bg: #f5f5f3;
+      --doc-text: #1a1a1a;
+      --doc-muted: #666;
+      --doc-border: #e0e0e0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--doc-bg);
+      color: var(--doc-text);
+      line-height: 1.6;
+      padding: 40px 20px 80px;
+    }
+
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    header {
+      border-bottom: 2px solid var(--doc-text);
+      padding-bottom: 24px;
+      margin-bottom: 48px;
+    }
+    header .eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--doc-muted);
+      margin-bottom: 8px;
+    }
+    header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    header p {
+      color: var(--doc-muted);
+      font-size: 14px;
+    }
+    header .sources {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    header .source-tag {
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--doc-text);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── Section ── */
+    section {
+      margin-bottom: 56px;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--doc-muted);
+      border-top: 1px solid var(--doc-border);
+      padding-top: 16px;
+      margin-bottom: 20px;
+    }
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    p { font-size: 14px; color: var(--doc-muted); margin-bottom: 12px; }
+    p:last-child { margin-bottom: 0; }
+
+    /* ── Color Palette ── */
+    .palette-group {
+      margin-bottom: 28px;
+    }
+    .palette-group h3 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--doc-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .swatches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .swatch-color {
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    .swatch-name {
+      font-size: 11px;
+      font-weight: 500;
+      text-align: center;
+    }
+    .swatch-hex {
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--doc-muted);
+    }
+
+    /* ── Typography ── */
+    .type-row {
+      border-top: 1px solid var(--doc-border);
+      padding: 16px 0;
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 16px;
+      align-items: baseline;
+    }
+    .type-label { font-size: 11px; color: var(--doc-muted); font-weight: 500; }
+    .type-sample-body { font-family: 'Inter', sans-serif; font-size: 14px; }
+    .type-sample-mono { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 600; }
+    .type-sample-title { font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 600; letter-spacing: -0.01em; }
+    .type-sample-label { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--doc-muted); }
+
+    /* ── Buttons ── */
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .btn-spec {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-spec .label {
+      font-size: 11px;
+      color: var(--doc-muted);
+      font-weight: 500;
+    }
+
+    /* Reconstructed buttons from source */
+    .demo-btn-circle {
+      width: 35px; height: 35px;
+      border-radius: 50%;
+      background-color: rgba(201, 54, 76, 0.87);
+      border: none;
+      color: white;
+      font-size: 16px; font-weight: 600;
+      cursor: pointer;
+      box-shadow: 3px 3px 19px 0px rgba(0,0,0,0.27);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .demo-btn-rounded-red {
+      width: 45px; height: 45px;
+      border-radius: 15%;
+      background-color: rgba(203, 35, 59, 0.87);
+      border: none;
+      color: white;
+      font-size: 16px; font-weight: 600;
+      cursor: pointer;
+      box-shadow: 3px 3px 19px 0px rgba(0,0,0,0.27);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .demo-btn-rounded-teal {
+      width: 45px; height: 45px;
+      border-radius: 15%;
+      background-color: #1babab;
+      border: none;
+      color: white;
+      font-size: 16px; font-weight: 600;
+      cursor: pointer;
+      box-shadow: 3px 3px 19px 0px rgba(0,0,0,0.27);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .demo-btn-math {
+      width: 45px; height: 45px;
+      border-radius: 15%;
+      background-color: #41afbd;
+      border: none;
+      color: white;
+      font-size: 16px; font-weight: 600;
+      cursor: pointer;
+      box-shadow: 3px 3px 19px 0px rgba(0,0,0,0.27);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .demo-btn-red-action {
+      width: 45px; height: 45px;
+      border-radius: 15%;
+      background-color: #b35764;
+      border: none;
+      color: white;
+      font-size: 16px; font-weight: 600;
+      cursor: pointer;
+      box-shadow: 3px 3px 19px 0px rgba(0,0,0,0.27);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .demo-btn-green-action {
+      width: 45px; height: 45px;
+      border-radius: 15%;
+      background-color: #20b286;
+      border: none;
+      color: white;
+      font-size: 16px; font-weight: 600;
+      cursor: pointer;
+      box-shadow: 3px 3px 19px 0px rgba(0,0,0,0.27);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── Cards ── */
+    .card-previews {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+    .card-demo {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+    .card-demo .label {
+      font-size: 11px;
+      color: var(--doc-muted);
+      font-weight: 500;
+    }
+    .card-red {
+      background-color: rgb(196, 40, 62);
+      width: 120px;
+      border-radius: 2%;
+      padding: 16px 12px;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      box-shadow: 3px 6px 8px -1px rgba(185, 63, 80, 0.92);
+      color: white; font-size: 12px; text-align: center;
+    }
+    .card-red .timer { font-size: 14px; font-weight: 600; }
+    .card-red .subtitle { color: rgba(105,38,38,0.81); font-weight: 600; font-size: 13px; }
+    .card-teal {
+      background-color: #1093af;
+      width: 120px;
+      border-radius: 2%;
+      padding: 12px 10px;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      box-shadow: 3px 6px 8px -1px rgba(87,148,148,1);
+      color: white; font-size: 12px;
+    }
+    .card-teal .display {
+      background: #2ac29a;
+      width: 90px; height: 22px;
+      border-radius: 3%;
+      box-shadow: inset 2px 3px 9px 1px rgba(0,0,0,0.27);
+      font-size: 12px; display: flex; align-items: center; justify-content: flex-end;
+      padding-right: 6px; color: white;
+    }
+
+    /* ── Shadows ── */
+    .shadow-demos {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+    .shadow-demo-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .shadow-box {
+      width: 70px; height: 70px;
+      border-radius: 8px;
+      background: white;
+    }
+    .shadow-box.s-card-red    { box-shadow: 3px 6px 8px -1px rgba(185, 63, 80, 0.92); }
+    .shadow-box.s-card-teal   { box-shadow: 3px 6px 8px -1px rgba(87,148,148,1); }
+    .shadow-box.s-btn         { box-shadow: 3px 3px 19px 0px rgba(0,0,0,0.27); }
+    .shadow-box.s-btn-hover   { box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.27); }
+    .shadow-box.s-btn-active  { box-shadow: inset 0px 0px 33px 16px rgba(0,0,0,0.27); }
+    .shadow-box.s-display     { box-shadow: inset 2px 3px 9px 1px rgba(0,0,0,0.27); background: #2ac29a; }
+    .shadow-label { font-size: 10px; color: var(--doc-muted); text-align: center; max-width: 70px; }
+
+    /* ── Principles ── */
+    .principles {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+    .principle-card {
+      background: white;
+      border: 1px solid var(--doc-border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .principle-card .icon {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+    .principle-card h4 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .principle-card p {
+      font-size: 12px;
+      color: var(--doc-muted);
+      margin: 0;
+    }
+
+    /* ── Spacing / Border Radius ── */
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .spec-table th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--doc-muted);
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--doc-border);
+    }
+    .spec-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: middle;
+    }
+    .spec-table tr:last-child td { border-bottom: none; }
+    .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #333; }
+
+    /* ── Interaction States ── */
+    .state-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 16px 0;
+      border-top: 1px solid var(--doc-border);
+    }
+    .state-row:last-child { border-bottom: 1px solid var(--doc-border); }
+    .state-label { font-size: 12px; font-weight: 500; width: 90px; flex-shrink: 0; }
+    .state-desc { font-size: 12px; color: var(--doc-muted); flex: 1; }
+
+    footer {
+      text-align: center;
+      font-size: 11px;
+      color: var(--doc-muted);
+      border-top: 1px solid var(--doc-border);
+      padding-top: 24px;
+      margin-top: 48px;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="eyebrow">Design Language Document</div>
+    <h1>Visual Style Guide<br>Jayash Raj — CodePen Projects</h1>
+    <p>Extracted from two utility apps sharing a cohesive design system.</p>
+    <div class="sources">
+      <span class="source-tag">rxeezw — Pomodoro Timer</span>
+      <span class="source-tag">MKyPWa — Calculator</span>
+      <span class="source-tag">todo — To-do List (derived)</span>
+    </div>
+  </header>
+
+  <!-- Overview -->
+  <section>
+    <div class="section-label">01 — Overview</div>
+    <h2>Design Character</h2>
+    <p>Both apps share an immediately recognizable visual language: compact, card-based widgets centered on the screen, saturated single-hue palettes per app, soft-square buttons with heavy drop shadows, and a consistent grid of icon-driven controls. The aesthetic is playful but purposeful — closer to physical hardware (a physical timer or retro calculator) than to a flat dashboard.</p>
+    <p>Despite being built years apart, the structural decisions are almost identical: same card width (~275–280px), same button size (45×45px), same border-radius logic (2% on cards, 15% on rectangular buttons, 50% on circular ones), and the same shadow system across all interactive elements.</p>
+  </section>
+
+  <!-- Color Palette -->
+  <section>
+    <div class="section-label">02 — Color</div>
+    <h2>Palette</h2>
+
+    <div class="palette-group">
+      <h3>Pomodoro — Red Theme</h3>
+      <div class="swatches">
+        <div class="swatch">
+          <div class="swatch-color" style="background: rgb(196,40,62);"></div>
+          <div class="swatch-name">Card BG</div>
+          <div class="swatch-hex">rgb(196, 40, 62)</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: rgba(201,54,76,0.87);"></div>
+          <div class="swatch-name">Btn Small</div>
+          <div class="swatch-hex">rgba(201,54,76,.87)</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: rgba(203,35,59,0.87);"></div>
+          <div class="swatch-name">Btn Large</div>
+          <div class="swatch-hex">rgba(203,35,59,.87)</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: rgba(105,38,38,0.81);"></div>
+          <div class="swatch-name">Title Art</div>
+          <div class="swatch-hex">rgba(105,38,38,.81)</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: rgba(230,230,230,0.96); border: 1px solid #ccc;"></div>
+          <div class="swatch-name">Page BG</div>
+          <div class="swatch-hex">rgba(230,230,230,.96)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="palette-group">
+      <h3>Calculator — Teal Theme</h3>
+      <div class="swatches">
+        <div class="swatch">
+          <div class="swatch-color" style="background: #bae5e5;"></div>
+          <div class="swatch-name">Page BG</div>
+          <div class="swatch-hex">#bae5e5</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #1093af;"></div>
+          <div class="swatch-name">Card BG</div>
+          <div class="swatch-hex">#1093af</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #1babab;"></div>
+          <div class="swatch-name">Btn Default</div>
+          <div class="swatch-hex">#1babab</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #41afbd;"></div>
+          <div class="swatch-name">Btn Math</div>
+          <div class="swatch-hex">#41afbd</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #2ac29a;"></div>
+          <div class="swatch-name">Display</div>
+          <div class="swatch-hex">#2ac29a</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="palette-group">
+      <h3>Shared — Semantic Accents</h3>
+      <div class="swatches">
+        <div class="swatch">
+          <div class="swatch-color" style="background: #b35764;"></div>
+          <div class="swatch-name">Destructive</div>
+          <div class="swatch-hex">#b35764</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #20b286;"></div>
+          <div class="swatch-name">Confirm / =</div>
+          <div class="swatch-hex">#20b286</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: rgba(245,236,236,0.96); border: 1px solid #ccc;"></div>
+          <div class="swatch-name">Text Light</div>
+          <div class="swatch-hex">rgba(245,236,236,.96)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="palette-group">
+      <h3>To-do — Lime Theme (derived)</h3>
+      <div class="swatches">
+        <div class="swatch">
+          <div class="swatch-color" style="background: rgba(220,235,210,0.96); border:1px solid #ccc;"></div>
+          <div class="swatch-name">Page BG</div>
+          <div class="swatch-hex">rgba(220,235,210,.96)</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: rgb(76,153,0);"></div>
+          <div class="swatch-name">Card BG</div>
+          <div class="swatch-hex">rgb(76,153,0)</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: rgba(120,200,20,0.9);"></div>
+          <div class="swatch-name">Btn Add</div>
+          <div class="swatch-hex">rgba(120,200,20,.9)</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #7ed957;"></div>
+          <div class="swatch-name">Task Row</div>
+          <div class="swatch-hex">#7ed957</div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: rgba(60,120,10,0.92);"></div>
+          <div class="swatch-name">Shadow</div>
+          <div class="swatch-hex">rgba(60,120,10,.92)</div>
+        </div>
+      </div>
+    </div>
+
+    <p>Each app uses a monochromatic background tinted to its hue. The Calculator establishes the fullest version of this rule — its page background (<span class="mono">#bae5e5</span>) is a light desaturated teal directly derived from the card color. The Pomodoro's background is a neutral grey (<span class="mono">rgba(230,230,230,.96)</span>), not themed. The To-do follows the Calculator's pattern with a soft sage wash (<span class="mono">rgba(220,235,210,.96)</span>) derived from the lime card hue.</p>
+  </section>
+
+  <!-- Background Color Rule -->
+  <section>
+    <div class="section-label">02b — Page Background</div>
+    <h2>Background Hue Rule</h2>
+    <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px;">
+      <div style="flex:1; min-width:160px; border-radius:8px; overflow:hidden; border:1px solid var(--doc-border);">
+        <div style="background:rgba(230,230,230,0.96); height:60px; display:flex; align-items:center; justify-content:center;">
+          <div style="background:rgb(196,40,62);width:40px;height:48px;border-radius:2%;box-shadow:3px 6px 8px -1px rgba(185,63,80,.92);"></div>
+        </div>
+        <div style="padding:10px 12px; font-size:11px;">
+          <div style="font-weight:600; margin-bottom:2px;">Pomodoro</div>
+          <div style="color:var(--doc-muted);">BG: neutral grey — not themed</div>
+          <div class="mono" style="font-size:10px; margin-top:4px;">rgba(230,230,230,.96)</div>
+        </div>
+      </div>
+      <div style="flex:1; min-width:160px; border-radius:8px; overflow:hidden; border:1px solid var(--doc-border);">
+        <div style="background:#bae5e5; height:60px; display:flex; align-items:center; justify-content:center;">
+          <div style="background:#1093af;width:40px;height:48px;border-radius:2%;box-shadow:3px 6px 8px -1px rgba(87,148,148,1);"></div>
+        </div>
+        <div style="padding:10px 12px; font-size:11px;">
+          <div style="font-weight:600; margin-bottom:2px;">Calculator ✓</div>
+          <div style="color:var(--doc-muted);">BG: light tint of card hue</div>
+          <div class="mono" style="font-size:10px; margin-top:4px;">#bae5e5</div>
+        </div>
+      </div>
+      <div style="flex:1; min-width:160px; border-radius:8px; overflow:hidden; border:1px solid var(--doc-border);">
+        <div style="background:rgba(220,235,210,.96); height:60px; display:flex; align-items:center; justify-content:center;">
+          <div style="background:rgb(76,153,0);width:40px;height:48px;border-radius:2%;box-shadow:3px 6px 8px -1px rgba(60,120,10,.92);"></div>
+        </div>
+        <div style="padding:10px 12px; font-size:11px;">
+          <div style="font-weight:600; margin-bottom:2px;">To-do ✓</div>
+          <div style="color:var(--doc-muted);">BG: light tint of card hue</div>
+          <div class="mono" style="font-size:10px; margin-top:4px;">rgba(220,235,210,.96)</div>
+        </div>
+      </div>
+    </div>
+    <p>The intended pattern (established by the Calculator, followed by To-do) is: page background = very light, low-saturation tint of the card's dominant hue. This keeps the card feeling native to the page rather than dropped onto a neutral canvas. Opacity near <span class="mono">0.96</span> is also consistent — a small transparency that softens the color slightly.</p>
+
+  <!-- Typography -->
+  <section>
+    <div class="section-label">03 — Typography</div>
+    <h2>Type System</h2>
+
+    <div class="type-row">
+      <div class="type-label">Display / Timer</div>
+      <div class="type-sample-mono">00:25:00</div>
+    </div>
+    <div class="type-row">
+      <div class="type-label">App Title</div>
+      <div class="type-sample-title">pomodoro</div>
+    </div>
+    <div class="type-row">
+      <div class="type-label">Button Label</div>
+      <div style="font-family: Arial, sans-serif; font-size: 16px; font-weight: 600;">7 &nbsp; + &nbsp; C &nbsp; =</div>
+    </div>
+    <div class="type-row">
+      <div class="type-label">Body / UI Text</div>
+      <div class="type-sample-body">Timer · Reset · Calculator</div>
+    </div>
+    <div class="type-row">
+      <div class="type-label">Secondary font</div>
+      <div class="type-sample-label">Roboto (Calculator) · Arial (Pomodoro)</div>
+    </div>
+
+    <br>
+    <table class="spec-table">
+      <tr><th>Role</th><th>Family</th><th>Size</th><th>Weight</th></tr>
+      <tr>
+        <td>Timer display</td>
+        <td class="mono">system monospace / default</td>
+        <td class="mono">inherited h1</td>
+        <td class="mono">normal</td>
+      </tr>
+      <tr>
+        <td>Button labels</td>
+        <td class="mono">Arial / Roboto</td>
+        <td class="mono">16px</td>
+        <td class="mono">600</td>
+      </tr>
+      <tr>
+        <td>Calculator display</td>
+        <td class="mono">Roboto</td>
+        <td class="mono">22px</td>
+        <td class="mono">normal</td>
+      </tr>
+      <tr>
+        <td>Page body</td>
+        <td class="mono">Arial / Roboto</td>
+        <td class="mono">18px</td>
+        <td class="mono">400</td>
+      </tr>
+    </table>
+    <br>
+    <p>Typography is functional rather than expressive. Sans-serif system fonts keep rendering fast. The one typographic accent: the Pomodoro title uses a deeply darkened version of the card color (<span class="mono">rgba(105,38,38,0.81)</span>) to create a "watermark" effect against the red card.</p>
+  </section>
+
+  <!-- Buttons -->
+  <section>
+    <div class="section-label">04 — Components</div>
+    <h2>Buttons</h2>
+
+    <div class="btn-row">
+      <div class="btn-spec">
+        <button class="demo-btn-circle">−</button>
+        <div class="label">Circle (35px)<br>border-radius: 50%</div>
+      </div>
+      <div class="btn-spec">
+        <button class="demo-btn-rounded-red">▶</button>
+        <div class="label">Soft-square Red (45px)<br>border-radius: 15%</div>
+      </div>
+      <div class="btn-spec">
+        <button class="demo-btn-rounded-teal">5</button>
+        <div class="label">Soft-square Teal (45px)<br>border-radius: 15%</div>
+      </div>
+      <div class="btn-spec">
+        <button class="demo-btn-math">÷</button>
+        <div class="label">Operator (teal variant)<br>#41afbd</div>
+      </div>
+      <div class="btn-spec">
+        <button class="demo-btn-red-action">C</button>
+        <div class="label">Destructive<br>#b35764</div>
+      </div>
+      <div class="btn-spec">
+        <button class="demo-btn-green-action">=</button>
+        <div class="label">Confirm<br>#20b286</div>
+      </div>
+    </div>
+
+    <table class="spec-table">
+      <tr><th>Variant</th><th>Size</th><th>Border Radius</th><th>Usage</th></tr>
+      <tr>
+        <td>Circle</td>
+        <td class="mono">35×35px</td>
+        <td class="mono">50%</td>
+        <td>Increment / Decrement (Pomodoro)</td>
+      </tr>
+      <tr>
+        <td>Soft-square</td>
+        <td class="mono">45×45px</td>
+        <td class="mono">15%</td>
+        <td>Primary actions, digit keys (both apps)</td>
+      </tr>
+      <tr>
+        <td>Operator variant</td>
+        <td class="mono">45×45px</td>
+        <td class="mono">15%</td>
+        <td>Math operators — lighter tint of card color</td>
+      </tr>
+      <tr>
+        <td>Destructive</td>
+        <td class="mono">45×45px</td>
+        <td class="mono">15%</td>
+        <td>Clear / Reset — semantic red regardless of theme</td>
+      </tr>
+      <tr>
+        <td>Confirm</td>
+        <td class="mono">45×45px</td>
+        <td class="mono">15%</td>
+        <td>Equals / Accept — semantic green</td>
+      </tr>
+    </table>
+
+    <br>
+    <div style="background:white; border:1px solid var(--doc-border); border-radius:8px; padding:16px; margin-top:4px;">
+      <div style="font-size:12px; font-weight:700; margin-bottom:10px; letter-spacing:0.05em; text-transform:uppercase; color:var(--doc-muted);">⚠ Border-radius on wide elements</div>
+      <p style="margin-bottom:10px;">Percentage-based <span class="mono">border-radius</span> behaves differently on non-square elements. On a square button, <span class="mono">15%</span> gives a subtle soft corner. On a wide rectangle (like an input or display screen), <span class="mono">15%</span> creates an extreme pill/oval shape. The source code uses <span class="mono">3%</span> for wide display elements — this is the correct value to use.</p>
+      <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
+        <div style="text-align:center;">
+          <div style="width:180px; height:36px; background:#2ac29a; border-radius:3%; box-shadow:inset 2px 3px 9px 1px rgba(0,0,0,.27); display:flex; align-items:center; justify-content:center; color:white; font-size:13px; font-weight:600; margin-bottom:6px;">border-radius: 3%</div>
+          <div style="font-size:11px; color:var(--doc-muted);">✓ Correct — from source</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="width:180px; height:36px; background:#b35764; border-radius:15%; box-shadow:inset 2px 3px 9px 1px rgba(0,0,0,.27); display:flex; align-items:center; justify-content:center; color:white; font-size:13px; font-weight:600; margin-bottom:6px;">border-radius: 15%</div>
+          <div style="font-size:11px; color:var(--doc-muted);">✗ Wrong — pill effect</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section>
+    <h2>Card / Widget Container</h2>
+    <div class="card-previews">
+      <div class="card-demo">
+        <div class="card-red">
+          <div class="subtitle">pomodoro</div>
+          <div class="timer">00:25:00</div>
+          <div style="display:flex; gap:6px; margin-top:4px;">
+            <div style="width:22px;height:22px;border-radius:50%;background:rgba(201,54,76,.87);box-shadow:3px 3px 10px rgba(0,0,0,.27);display:flex;align-items:center;justify-content:center;font-size:10px;">−</div>
+            <div style="width:22px;height:22px;border-radius:50%;background:rgba(201,54,76,.87);box-shadow:3px 3px 10px rgba(0,0,0,.27);display:flex;align-items:center;justify-content:center;font-size:10px;">+</div>
+          </div>
+        </div>
+        <div class="label">Pomodoro Card</div>
+      </div>
+      <div class="card-demo">
+        <div class="card-teal">
+          <div class="display">0</div>
+          <div style="display:flex;gap:5px;margin-top:4px;flex-wrap:wrap;justify-content:center;max-width:100px;">
+            <div style="width:20px;height:20px;border-radius:15%;background:#1babab;box-shadow:2px 2px 8px rgba(0,0,0,.27);display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:600;">7</div>
+            <div style="width:20px;height:20px;border-radius:15%;background:#1babab;box-shadow:2px 2px 8px rgba(0,0,0,.27);display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:600;">8</div>
+            <div style="width:20px;height:20px;border-radius:15%;background:#1babab;box-shadow:2px 2px 8px rgba(0,0,0,.27);display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:600;">9</div>
+            <div style="width:20px;height:20px;border-radius:15%;background:#41afbd;box-shadow:2px 2px 8px rgba(0,0,0,.27);display:flex;align-items:center;justify-content:center;font-size:9px;color:white;font-weight:600;">÷</div>
+          </div>
+        </div>
+        <div class="label">Calculator Card</div>
+      </div>
+
+      <div style="flex: 1; min-width: 200px;">
+        <table class="spec-table">
+          <tr><th>Property</th><th>Value</th></tr>
+          <tr><td>Width</td><td class="mono">275–280px</td></tr>
+          <tr><td>Padding</td><td class="mono">15px</td></tr>
+          <tr><td>Border radius</td><td class="mono">2%</td></tr>
+          <tr><td>Position</td><td class="mono">margin: 20vh auto</td></tr>
+          <tr><td>Shadow</td><td class="mono">3px 6px 8px -1px [theme color]</td></tr>
+        </table>
+      </div>
+    </div>
+    <br>
+    <p>Cards are tightly fixed-width widgets, always center-aligned with vertical breathing room via <span class="mono">20vh</span> top margin. The card shadow is always colored (matching the theme hue), not generic grey — this creates a "glowing" elevation effect that reinforces the theme.</p>
+  </section>
+
+  <!-- Shadow System -->
+  <section>
+    <div class="section-label">05 — Shadow System</div>
+    <h2>Depth & Shadow</h2>
+    <div class="shadow-demos">
+      <div class="shadow-demo-item">
+        <div class="shadow-box s-card-red"></div>
+        <div class="shadow-label">Card (colored)<br>3px 6px 8px -1px</div>
+      </div>
+      <div class="shadow-demo-item">
+        <div class="shadow-box s-card-teal"></div>
+        <div class="shadow-label">Card teal<br>3px 6px 8px -1px</div>
+      </div>
+      <div class="shadow-demo-item">
+        <div class="shadow-box s-btn"></div>
+        <div class="shadow-label">Button resting<br>3px 3px 19px rgba(.27)</div>
+      </div>
+      <div class="shadow-demo-item">
+        <div class="shadow-box s-btn-hover"></div>
+        <div class="shadow-label">Button hover<br>1px 1px 5px rgba(.27)</div>
+      </div>
+      <div class="shadow-demo-item">
+        <div class="shadow-box s-btn-active" style="background:#555;"></div>
+        <div class="shadow-label">Button :active<br>inset 33px 16px</div>
+      </div>
+      <div class="shadow-demo-item">
+        <div class="shadow-box s-display"></div>
+        <div class="shadow-label">Display inset<br>inset 2px 3px 9px</div>
+      </div>
+    </div>
+    <br>
+    <p>The shadow system conveys a full tactile hierarchy: cards float above the page with a <em>colored</em> shadow, buttons rest with a medium diffuse shadow, hover tightens the shadow (button feels closer), active press adds a deep inset shadow (button feels depressed). The calculator display uses an inset shadow to look like a sunken screen.</p>
+  </section>
+
+  <!-- Interaction States -->
+  <section>
+    <div class="section-label">06 — Interaction</div>
+    <h2>States</h2>
+
+    <div class="state-row">
+      <div class="state-label">Resting</div>
+      <div style="display:flex;gap:8px;">
+        <button class="demo-btn-rounded-teal" style="pointer-events:none;">5</button>
+      </div>
+      <div class="state-desc"><span class="mono">box-shadow: 3px 3px 19px 0px rgba(0,0,0,0.27)</span> — medium spread, neutral grey</div>
+    </div>
+    <div class="state-row">
+      <div class="state-label">Hover</div>
+      <div style="display:flex;gap:8px;">
+        <button class="demo-btn-rounded-teal" style="pointer-events:none; box-shadow:1px 1px 5px 0px rgba(0,0,0,0.27);">5</button>
+      </div>
+      <div class="state-desc"><span class="mono">box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.27)</span> — shadow shrinks; button appears to rise slightly</div>
+    </div>
+    <div class="state-row">
+      <div class="state-label">Active / Press</div>
+      <div style="display:flex;gap:8px;">
+        <button class="demo-btn-rounded-teal" style="pointer-events:none; box-shadow: inset 0px 0px 33px 16px rgba(0,0,0,0.27);">5</button>
+      </div>
+      <div class="state-desc"><span class="mono">box-shadow: inset 0px 0px 33px 16px rgba(0,0,0,0.27)</span> — heavy inset shadow simulates physical press</div>
+    </div>
+    <div class="state-row">
+      <div class="state-label">Play/Pause toggle</div>
+      <div style="display:flex;gap:8px;"></div>
+      <div class="state-desc">Button swaps class between <span class="mono">btn-success</span> (green → play) and <span class="mono">btn-danger</span> (red → pause) using jQuery class toggling. Icon also swaps: <span class="mono">fa-play ↔ fa-pause</span></div>
+    </div>
+  </section>
+
+  <!-- Design Principles -->
+  <section>
+    <div class="section-label">07 — Design Principles</div>
+    <h2>Recurring Patterns</h2>
+    <div class="principles">
+      <div class="principle-card">
+        <div class="icon">🎨</div>
+        <h4>Monochromatic Theming</h4>
+        <p>Each app picks one saturated hue and uses tints/shades of it for every element. Theme color never mixes with the other app's hue.</p>
+      </div>
+      <div class="principle-card">
+        <div class="icon">🟦</div>
+        <h4>Semantic Color Constants</h4>
+        <p>Destructive (red #b35764) and confirm (green #20b286) override the theme color regardless of which app. Meaning > decoration.</p>
+      </div>
+      <div class="principle-card">
+        <div class="icon">📦</div>
+        <h4>Fixed-Width Widget</h4>
+        <p>Both apps are ~280px wide, vertically centered. The card is a self-contained object — not a responsive layout, but a discrete tool.</p>
+      </div>
+      <div class="principle-card">
+        <div class="icon">🔲</div>
+        <h4>Soft-Square Buttons</h4>
+        <p>15% border-radius strikes between a circle and a rectangle. Feels touchable, not sterile. Consistent 45×45px across both apps.</p>
+      </div>
+      <div class="principle-card">
+        <div class="icon">💡</div>
+        <h4>Tactile Shadow Hierarchy</h4>
+        <p>Cards glow with colored shadow. Buttons press inward on :active. Display screen sits inset. Every state has a physical metaphor.</p>
+      </div>
+      <div class="principle-card">
+        <div class="icon">🏋️</div>
+        <h4>Bold, White-on-Color Text</h4>
+        <p>All button text is white, font-weight 600. High contrast against saturated backgrounds. No neutral grey in interactive elements.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Design Language Document · Extracted from CodePen pens rxeezw & MKyPWa by Jayash Raj Mudbhari · June 2026
+  </footer>
+
+</div>
+</body>
+</html>
